@@ -4,8 +4,9 @@ upscale: 320
 downscale: 3840
 multiplier: 1
 lazy_offset: 100
-core_webp: false
+core_webp: true
 imageapi_optimize_webp: false
 automated_crop: ''
 fallback_style: ''
 cache_max_age: 0
+legacy_lazyload: null

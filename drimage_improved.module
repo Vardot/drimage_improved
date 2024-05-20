@@ -27,7 +27,7 @@ function drimage_improved_help($route_name, RouteMatchInterface $route_match) {
  */
 function drimage_improved_theme() {
   return [
-    'drimage_improved_formatter' => [
+    'drimage_formatter' => [
       'variables' => [
         'item' => NULL,
         'item_attributes' => NULL,

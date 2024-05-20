@@ -1,4 +1,4 @@
-.drimage_improved.is-loading {
+.drimage.is-loading {
   opacity: 0;
   animation: color-change .45s ease-in-out forwards;
 }

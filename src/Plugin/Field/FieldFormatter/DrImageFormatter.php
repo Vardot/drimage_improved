@@ -249,8 +249,8 @@ class DrImageFormatter extends ImageFormatter {
 
     foreach ($elements as $delta => $element) {
       $elements[$delta]['#item_attributes'] = new Attribute();
-      $elements[$delta]['#item_attributes']['class'] = ['drimage_improved'];
-      $elements[$delta]['#theme'] = 'drimage_improved_formatter';
+      $elements[$delta]['#item_attributes']['class'] = ['drimage'];
+      $elements[$delta]['#theme'] = 'drimage_formatter';
 
       $elements[$delta]['#data'] = [
         'fid' => $elements[$delta]['#item']->entity->id(),

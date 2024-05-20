@@ -26,7 +26,7 @@
     if (el.parentNode === null) {
       return null;
     }
-    if (el.parentNode.classList && el.parentNode.classList.contains('js-delay-drimage_improved')) {
+    if (el.parentNode.classList && el.parentNode.classList.contains('js-delay-drimage')) {
       return el.parentNode;
     }
     return Drupal.drimage_improved.findDelayParent(el.parentNode);
@@ -142,7 +142,7 @@
     if (typeof context === 'undefined') {
       context = document;
     }
-    var el = context.querySelectorAll('.drimage_improved:not(.is-loading)');
+    var el = context.querySelectorAll('.drimage:not(.is-loading)');
     if (el.length > 0) {
       for (var i = 0; i < el.length; i++) {
         var data = Drupal.drimage_improved.fetchData(el[i]);
