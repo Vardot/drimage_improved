@@ -18,7 +18,7 @@
 #}
 {% set dummy_image = "data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg'%20width='" ~ width ~ "'%20height='" ~ height ~ "'%20viewBox='0%200%20" ~ width ~ "%20" ~ height ~"'%20%3E%3C/svg%3E" %}
 {{ attach_library('drimage_improved/drimage_improved') }}
-<div {{ item_attributes }} data-drimage="{{ data|json_encode }}">
+<div {{ item_attributes }} data-drimage_improved="{{ data|json_encode }}">
   {# Prevent spaces in the link by glueing a and picture element together. #}
   {% if url %}
   <a href="{{ url }}"><picture>

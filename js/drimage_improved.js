@@ -54,7 +54,7 @@
   };
 
   Drupal.drimage_improved.fetchData = function (el) {
-    var data = JSON.parse(el.getAttribute('data-drimage'));
+    var data = JSON.parse(el.getAttribute("data-drimage_improved"));
     data.upscale = parseInt(data.upscale);
     data.downscale = parseInt(data.downscale);
     data.threshold = parseInt(data.threshold);
@@ -242,7 +242,8 @@
               imgUrl = imgUrl + '_' + data.iwc.image_style;
             }
             imgUrl = imgUrl + "/" + data.scheme + "/" + encodeURI(data.original_source);
-            if ((data.core_webp || data.imageapi_optimize_webp) && imgUrl.slice(-5) !== ".webp") {
+            // check if imgUrl does not end in webp.
+            if ((data.core_webp || data.imageapi_optimize_webp) && imgUrl.substring(imgUrl.length - 5) !== '.webp') {
               imgUrl = imgUrl + ".webp";
             }
             if (data.image_handling === 'background') {
@@ -256,7 +257,7 @@
               if (data.core_webp || data.imageapi_optimize_webp) {
                 var source = el.querySelector('source[data-format="webp"]');
                 if (source) {
-                  source.setAttribute("srcset", imgUrl);
+                  source.setAttribute('srcset', imgUrl);
                 }
               }
               img.onload = function() {
