@@ -117,10 +117,11 @@ final class DrimageSubscriber implements EventSubscriberInterface {
       $file_path = substr($path, strpos($path, $scheme) + strlen($scheme) + 1);
       $file_name = $file_path;
       if ($config->get('imageapi_optimize_webp') || $config->get('core_webp')) {
-        // Remove the extrap .webp in the filename.
-        $file_name = substr($file_name, 0, (strrpos($file_name, '.')));
+        // Remove the extra .webp in the filename.
+        if (preg_match('/\.[a-zA-Z]{3,4}\.webp$/i', $file_name)) {
+          $file_name = substr($file_name, 0, (strrpos($file_name, '.')));
+        }
       }
-      // dd($file_name);
       // Redirect to drimage_improved.image route.
       $image = $this->entityTypeManager->getStorage('file')->loadByProperties(['uri' => $scheme . '://' . urldecode($file_name)]);
       $filename = end($parts);
