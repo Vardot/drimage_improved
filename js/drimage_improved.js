@@ -246,6 +246,7 @@
             if ((data.core_webp || data.imageapi_optimize_webp) && imgUrl.substring(imgUrl.length - 5) !== '.webp') {
               imgUrl = imgUrl + ".webp";
             }
+            imgUrl = Drupal.url(imgUrl);
             if (data.image_handling === 'background') {
               img.onload = function() {
                 el.classList.remove('is-loading');

@@ -239,7 +239,7 @@ class DrImageFormatter extends ImageFormatter {
 
     $config = \Drupal::configFactory()->get('drimage_improved.settings');
 
-    $url = '/' . \Drupal::service('stream_wrapper_manager')->getViaScheme('public')->getDirectoryPath();
+    $url = \Drupal::service('stream_wrapper_manager')->getViaScheme('public')->getDirectoryPath();
 
     // Get the image loading attribute, revert to legacy if none was found.
     $image_loading = $this->getSetting('image_loading')['attribute'];
