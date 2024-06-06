@@ -184,4 +184,12 @@ function drimage_improved_page_attachments(array &$attachments) {
   }
   $attachments['#attached']['drupalSettings']['drimage_improved']['ratio_distortion'] = $settings->get('ratio_distortion');
   $attachments['#attached']['drupalSettings']['drimage_improved']['dimentions'] = $dimentions;
+
+  $noscript = [
+    '#noscript' => TRUE,
+    '#tag' => 'style',
+    '#value' => '.drimage-image { display: none; }',
+  ];
+
+  $attachments['#attached']['html_head'][] = [$noscript, 'noscript'];
 }
