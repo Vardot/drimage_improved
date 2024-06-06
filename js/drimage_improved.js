@@ -272,29 +272,49 @@
     }
   };
 
+  // Declare a variable for the IntersectionObserver
+  let observer;
+
+  /**
+   * Callback function for the IntersectionObserver.
+   * This function is called whenever an observed element enters or exits the viewport.
+   * @param {IntersectionObserverEntry[]} entries - An array of IntersectionObserverEntry objects.
+   */
+  function handleIntersection(entries) {
+    entries.forEach(entry => {
+      // Check if the element is intersecting (i.e., in the viewport)
+      if (entry.isIntersecting) {
+        // Render the element (load the image)
+        Drupal.drimage_improved.renderEl(entry.target);
+        // Stop observing the element since it has already been loaded
+        observer.unobserve(entry.target);
+      }
+    });
+  }
+
+  // Define a Drupal behavior for improved image handling
   Drupal.behaviors.drimage_improved = {
+    /**
+     * Attaches the behavior to elements within the specified context.
+     * @param {HTMLElement} context - The context within which to search for elements.
+     */
     attach: function (context) {
-      // The webp check (for backgrounds only) is async.
-      // The current JS is not written to properly handle async/promises.
-      // So we will have to rely on the small timeout on the init function below.
-      // If the delay is not enough, the script will simply render jpg/png instead of webp.
-      // This is not what it should do, but it is acceptable until we can do a rewrite of the JS.
+      // Check for WebP support (asynchronously)
       Drupal.drimage_improved.checkWebp();
 
-      // Always update entire document.
-      // Other elements on the page might have changed the DOM and we need to force reload our lazyloader calculations.
-      // Set a small timeout so lots of concurrent behaviour triggers don't case to much load.
-      var timer;
-      clearTimeout(timer);
-      timer = setTimeout(Drupal.drimage_improved.init, 5, document);
+      // Initialize the IntersectionObserver if it hasn't been created yet
+      if (!observer) {
+        observer = new IntersectionObserver(handleIntersection, {
+          rootMargin: '50px', // Load images 50px before they enter the viewport
+          threshold: 0.1      // Trigger the callback when 10% of the element is visible
+        });
+      }
 
-      addEventListener('resize', function () {
-        clearTimeout(timer);
-        timer = setTimeout(Drupal.drimage_improved.init, 100);
-      });
-
-      addEventListener('scroll', function () {
-        Drupal.drimage_improved.init(document);
+      // Find all images that haven't been loaded yet
+      const images = context.querySelectorAll('.drimage:not(.is-loading)');
+      images.forEach(img => {
+        // Start observing each image
+        observer.observe(img);
       });
     }
   };
