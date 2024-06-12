@@ -292,6 +292,20 @@
     });
   }
 
+  function handleResize() {
+    const images = document.querySelectorAll('.drimage:not(.is-loading)');
+    images.forEach(img => {
+      observer.unobserve(img);
+      observer.observe(img);
+    });
+  }
+
+  let resizeTimeout;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(handleResize, 100);
+  });
+
   // Define a Drupal behavior for improved image handling
   Drupal.behaviors.drimage_improved = {
     /**
