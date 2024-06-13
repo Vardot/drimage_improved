@@ -49,20 +49,6 @@ INSTALLATION
  * You may want to disable Responsive Image Style module, since this module is
    meant to replace that one.
 
- * (optional) If you are using an Apache webserver you can use custom htaccess
-   rewrite rules to lower the load on your server and have existing files be
-   loaded directly instead of bootstrapping Drupal.
-   Use this snippet in your composer file:
-     "extra": {
-         "drupal-scaffold": {
-             "file-mapping": {
-                 "[web-root]/.htaccess": {
-                     "prepend": "web/modules/contrib/drimage_improved/htaccess.prepend.txt"
-                 }
-             }
-         }
-     }
-
 
 CONFIGURATION
 -------------
