@@ -62,8 +62,8 @@ class DrImageController extends ImageStyleDownloadController {
    *
    * @param array $requested_dimensions
    *   The calculated requested dimensions.
-   * @param string|NULL $iwc_id
-   *    Optional image_widget_crop crop type to use.
+   * @param string|null $iwc_id
+   *   Optional image_widget_crop crop type to use.
    *
    * @return string The id drimage_improved should use for image_styles.
    */
@@ -88,8 +88,8 @@ class DrImageController extends ImageStyleDownloadController {
    *
    * @param array $requested_dimensions
    *   The calculated requested dimensions.
-   * @param string|NULL $iwc_id
-   *    Optional image_widget_crop crop type to use.
+   * @param string|null $iwc_id
+   *   Optional image_widget_crop crop type to use.
    *
    * @return string The label drimage_improved should use for image_styles.
    */
@@ -114,8 +114,8 @@ class DrImageController extends ImageStyleDownloadController {
    *
    * @param array $requested_dimensions
    *   The calculated requested dimensions.
-   * @param string|NULL $iwc_id
-   *    Optional image_widget_crop crop type to use.
+   * @param string|null $iwc_id
+   *   Optional image_widget_crop crop type to use.
    *
    * @return mixed
    *   A matching image style or NULL if none was found.
@@ -186,8 +186,8 @@ class DrImageController extends ImageStyleDownloadController {
    *
    * @param array $requested_dimensions
    *   The array containing the dimensions.
-   * @param string|NULL $iwc_id
-   *    Optional image_widget_crop crop type to use.
+   * @param string|null $iwc_id
+   *   Optional image_widget_crop crop type to use.
    *
    * @return mixed
    *   The image style or FALSE in case something went wrong.
@@ -302,15 +302,15 @@ class DrImageController extends ImageStyleDownloadController {
    * @param \Symfony\Component\HttpFoundation\Request $request
    *   The request object.
    * @param int $width
-   *    The requested width in pixels that came from the JS.
+   *   The requested width in pixels that came from the JS.
    * @param int $height
-   *    The requested height in pixels that came from the JS.
+   *   The requested height in pixels that came from the JS.
    * @param int $fid
-   *    The file id to render.
-   * @param string|NULL $iwc_id
-   *    (optional) The id for the image_widget crop type to use.
-   * @param string|NULL $format
-   *    (optional) The format to render the image in. Can be webp, jpg, png, ...
+   *   The file id to render.
+   * @param string|null $iwc_id
+   *   (optional) The id for the image_widget crop type to use.
+   * @param string|null $format
+   *   (optional) The format to render the image in. Can be webp, jpg, png, ...
    *    When NULL will fallback to jpg/png format. (the default file in the filesystem)
    *    Currently only webp is actually supported as an alternative.
    *
@@ -360,7 +360,7 @@ class DrImageController extends ImageStyleDownloadController {
       if (!$this->moduleHandler()->moduleExists('image_widget_crop')) {
         $error_msg = $this->t('Image_widget_crop module is not active.');
       }
-      else if (!$crop_type = \Drupal::entityTypeManager()->getStorage('crop_type')->load($iwc_id)) {
+      elseif (!$crop_type = \Drupal::entityTypeManager()->getStorage('crop_type')->load($iwc_id)) {
         $error_msg = $this->t('Image_widget_crop type not found.');
       }
     }
@@ -394,14 +394,13 @@ class DrImageController extends ImageStyleDownloadController {
       }
 
       // Uncomment to test the loading effect:
-      //usleep(1000000);
-
+      // usleep(1000000);
       // Give the browser back an image in the format it requested.
       // This can be:
       //    - webp through the imageapi_optimize_webp module
       //    - or it will fall back to the default file in the filesystem for all other formats passed.
       // @see: \Drupal\drimage_improved\PathProcessor\PathProcessorImageStyles::processInbound()
-      // @todo: should probably override the deliver function to handle this properly.
+      // @todo should probably override the deliver function to handle this properly.
       //
       // Added a looped try-catch construction to try and catch various deadlock issues.
       // These are hard te debug and it is not totally clear where they emerge from also.

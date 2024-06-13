@@ -2,14 +2,14 @@
 
 namespace Drupal\drimage_improved\Form;
 
-use Drupal\Core\ImageToolkit\ImageToolkitManager;
-use Drupal\crop\Events\AutomaticCropProviders;
-use Drupal\crop\Events\Events;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\ImageToolkit\ImageToolkitManager;
+use Drupal\crop\Events\AutomaticCropProviders;
+use Drupal\crop\Events\Events;
 use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -57,7 +57,7 @@ class DrimageSettingsForm extends ConfigFormBase {
     ConfigFactoryInterface $config_factory,
     DateFormatterInterface $date_formatter,
     ModuleHandlerInterface $module_handler,
-    ImageToolkitManager $image_toolkit_manager
+    ImageToolkitManager $image_toolkit_manager,
   ) {
     parent::__construct($config_factory);
     $this->dateFormatter = $date_formatter;
@@ -173,9 +173,11 @@ class DrimageSettingsForm extends ConfigFormBase {
           ->save();
         $core_webp_option_enabled = FALSE;
       }
-    } elseif (in_array('webp', $image_toolkit->getSupportedExtensions())) {
+    }
+    elseif (in_array('webp', $image_toolkit->getSupportedExtensions())) {
       $allow_core_webp = TRUE;
-    } elseif ($core_webp_option_enabled === TRUE) {
+    }
+    elseif ($core_webp_option_enabled === TRUE) {
       // Disable core WebP if Webp support is removed from the image toolkit.
       $this->config('drimage_improved.settings')->set('core_webp', FALSE)
         ->save();
@@ -191,7 +193,7 @@ class DrimageSettingsForm extends ConfigFormBase {
     ];
 
     if ($image_toolkit->getPluginId() === 'gd') {
-        $form['core_webp']['#description'] .= ' ' . $this->t('Visit the <a href="@statusReportUrl">status report</a> to check if your current GD version supports webp.', ['@statusReportUrl' => '/admin/reports/status/php#module_gd']);
+      $form['core_webp']['#description'] .= ' ' . $this->t('Visit the <a href="@statusReportUrl">status report</a> to check if your current GD version supports webp.', ['@statusReportUrl' => '/admin/reports/status/php#module_gd']);
     }
 
     $form['imageapi_optimize_webp'] = [

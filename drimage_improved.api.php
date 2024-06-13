@@ -14,14 +14,14 @@ use Drupal\image\Entity\ImageStyle;
  *   The array of proxy cache periods.
  */
 function hook_drimage_improved_proxy_cache_periods_alter(array &$periods) {
-  // Set a new proxy cache period
+  // Set a new proxy cache period.
   $periods[] = 32400;
 }
 
 /**
  * Alter auto-generated image style.
  *
- * @param ImageStyle $style
+ * @param \Drupal\image\Entity\ImageStyle $style
  *   Image style to be created.
  */
 function hook_drimage_improved_image_style_alter(ImageStyle &$style) {

@@ -43,7 +43,7 @@ class DrimagePathProcessorRedirectSubscriber implements EventSubscriberInterface
    */
   public function __construct(
     PathProcessorManager $pathProcessorManager,
-    ConfigFactoryInterface $configFactory
+    ConfigFactoryInterface $configFactory,
   ) {
     $this->pathProcessorManager = $pathProcessorManager;
     $this->configFactory = $configFactory;

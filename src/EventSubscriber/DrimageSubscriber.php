@@ -13,8 +13,8 @@ use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\Core\Url;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -96,7 +96,7 @@ final class DrimageSubscriber implements EventSubscriberInterface {
    * Kernel request event handler.
    *
    * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
-   *  The request event.
+   *   The request event.
    */
   public function onKernelRequest(RequestEvent $event) {
     // Check if the request contains with /styles/drimage_improved_.

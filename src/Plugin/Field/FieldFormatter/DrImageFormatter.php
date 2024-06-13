@@ -5,7 +5,6 @@ namespace Drupal\drimage_improved\Plugin\Field\FieldFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Template\Attribute;
-use Drupal\Core\Url;
 use Drupal\crop\Entity\CropType;
 use Drupal\image\Plugin\Field\FieldFormatter\ImageFormatter;
 
@@ -268,7 +267,7 @@ class DrImageFormatter extends ImageFormatter {
         'lazyload' => $image_loading,
       ];
 
-      list($scheme, $uri) = explode(':', $files[$delta]->getFileUri());
+      [$scheme, $uri] = explode(':', $files[$delta]->getFileUri());
       $uri = ltrim($uri, '/');
       // Get original image data. (non cropped, non processed) This is useful when
       // implementing lightbox-style plugins that show the original image.

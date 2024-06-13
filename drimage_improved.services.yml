@@ -27,6 +27,6 @@ services:
 
   drimage_improved.event_subscriber:
     class: Drupal\drimage_improved\EventSubscriber\DrimageSubscriber
-    arguments: [ '@stream_wrapper_manager' , '@entity_type.manager', '@module_handler', '@config.factory']
+    arguments: [ '@stream_wrapper_manager' , '@entity_type.manager', '@module_handler', '@config.factory', '@logger.factory']
     tags:
       - { name: event_subscriber }

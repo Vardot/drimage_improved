@@ -74,7 +74,7 @@ class DrimageStageFileProxySubscriber implements EventSubscriberInterface {
     PathProcessorManager $pathProcessorManager,
     HttpKernelInterface $kernel,
     ImageFactory $imageFactory,
-    FileUrlGeneratorInterface $fileUrlGenerator
+    FileUrlGeneratorInterface $fileUrlGenerator,
   ) {
     $this->fileUrlGenerator = $fileUrlGenerator;
     $this->imageFactory = $imageFactory;
@@ -97,8 +97,8 @@ class DrimageStageFileProxySubscriber implements EventSubscriberInterface {
       $event->getRequest()
     );
 
-    if (substr($request_uri, 0, 8 ) === '/drimage_improved') {
-      [,,,,$fid] = explode('/', $request_uri);
+    if (substr($request_uri, 0, 8) === '/drimage_improved') {
+      [,,,, $fid] = explode('/', $request_uri);
       $file = File::load($fid);
 
       // The expected location is only known for managed files.

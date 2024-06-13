@@ -40,7 +40,7 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
    * {@inheritdoc}
    */
   public function processInbound($path, Request $request) {
-    // @todo: shorten this, don't need $path_prefix as variable.
+    // @todo shorten this, don't need $path_prefix as variable.
     if (strpos($path, '/drimage_improved/') === 0) {
       $path_prefix = '/drimage_improved/';
     }
@@ -56,7 +56,7 @@ class PathProcessorImageStyles implements InboundPathProcessorInterface {
       [$width, $height, $fid, $iwc_id, $file] = explode('/', $rest, 5);
 
       // Set the file as query parameter.
-      // @todo: this doesn't seem to be used anywhere, can we remove it?
+      // @todo this doesn't seem to be used anywhere, can we remove it?
       $request->query->set('filename', $file);
 
       // Get the extension and pass that along as the format parameter.

@@ -50,7 +50,8 @@ function drimage_improved_theme() {
 function drimage_improved_entity_type_alter(array &$entity_types): void {
   if (isset($entity_types['imageapi_optimize_pipeline'])) {
     $entity_types['image_style']->setListBuilderClass(ImageStyleWithPipelineListBuilder::class);
-  } else {
+  }
+  else {
     $entity_types['image_style']->setListBuilderClass(ImageStyleListBuilder::class);
   }
 }

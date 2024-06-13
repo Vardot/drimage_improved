@@ -27,7 +27,7 @@ class DrImageUriFormatter extends DrImageFormatter {
   public function viewElements(FieldItemListInterface $items, $langcode) {
     $elements = [];
 
-    // @todo: can it not be multiple?
+    // @todo can it not be multiple?
     $file = $items->getEntity();
     $config = \Drupal::configFactory()->get('drimage_improved.settings');
 
