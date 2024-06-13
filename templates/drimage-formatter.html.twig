@@ -31,14 +31,13 @@
   {% endif %}
     <img src="{{ dummy_image }}" width="{{ width }}" height="{{ height }}" alt="{{ alt }}" class="drimage-image" />
 
-    <noscript>
-      <img src="/{{ data.subdir }}/{{ data.original_source }}" alt="{{ alt }}" width="{{ data.original_width }}" height="{{ data.original_height }}" loading="lazy">
-    </noscript>
-
   {% if url %}
   </picture></a>
   {% else %}
   </picture>
   {% endif %}
-</div>
 
+  <noscript>
+    <img src="/{{ data.subdir }}/{{ data.original_source }}" alt="{{ alt }}" width="{{ data.original_width }}" height="{{ data.original_height }}" loading="lazy">
+  </noscript>
+</div>
