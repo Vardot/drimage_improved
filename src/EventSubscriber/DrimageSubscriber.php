@@ -112,10 +112,12 @@ final class DrimageSubscriber implements EventSubscriberInterface {
       $style_parts = explode('_', $style);
       $scheme = $parts[3];
       $iwc_id = '-';
-      if ($this->moduleHandler->moduleExists('image_widget_crop')) {
-        $width = $style_parts[2];
-        $height = $style_parts[3];
-        $iwc_id = $style_parts[4];
+      if ($this->moduleHandler->moduleExists('image_widget_crop') && isset($style_parts[3])) {
+        $width = $style_parts[1];
+        $height = $style_parts[2];
+        // Need to implode all parts from index 3 and further to get the correct iwc_id.
+        // The image widget crop id itself can contain underscores.
+        $iwc_id = implode('_', array_slice($style_parts, 3));
       }
       elseif ($this->moduleHandler->moduleExists('focal_point')) {
         $width = $style_parts[3];
