@@ -8,10 +8,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
-use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
-use Drupal\Core\Url;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\drimage_improved\DrimageManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -58,6 +56,13 @@ final class DrimageSubscriber implements EventSubscriberInterface {
   protected $loggerFactory;
 
   /**
+   * The Drimage manager.
+   *
+   * @var \Drupal\drimage_improved\DrimageManagerInterface
+   */
+  protected $drimageManager;
+
+  /**
    * Constructs a new DrimageRoutes object.
    *
    * @param \Drupal\Core\StreamWrapper\StreamWrapperManagerInterface $stream_wrapper_manager
@@ -70,26 +75,16 @@ final class DrimageSubscriber implements EventSubscriberInterface {
    *   The config factory.
    * @param \Drupal\Core\Logger\LoggerChannelFactory $logger_factory
    *   The logger factory.
+   * @param \Drupal\drimage_improved\DrimageManagerInterface $drimage_manager
+   *  The Drimage manager.
    */
-  public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory) {
+  public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, DrimageManagerInterface $drimage_manager) {
     $this->streamWrapperManager = $stream_wrapper_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->moduleHandler = $module_handler;
     $this->configFactory = $config_factory;
     $this->loggerFactory = $logger_factory->get('drimage_improved');
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('stream_wrapper_manager'),
-      $container->get('entity_type.manager'),
-      $container->get('module_handler'),
-      $container->get('config.factory'),
-      $container->get('logger.factory')
-    );
+    $this->drimageManager = $drimage_manager;
   }
 
   /**
@@ -164,16 +159,8 @@ final class DrimageSubscriber implements EventSubscriberInterface {
         return new Response('Error generating image, missing source file.', 404);
       }
 
-      // Create url from drimage_improved.image route.
-      $url = Url::fromRoute('drimage_improved.image', [
-        'width' => $width,
-        'height' => $height,
-        'fid' => end($image)->id(),
-        'iwc_id' => $iwc_id,
-        'format' => $format,
-      ]);
-      $response = new TrustedRedirectResponse($url->setAbsolute()->toString());
-      $response->send();
+      // Deliver the image.
+      $this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) end($image)->id(), $iwc_id, $format);
     }
   }
 
