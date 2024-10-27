@@ -99,8 +99,10 @@ final class DrimageSubscriber implements EventSubscriberInterface {
     if (strpos($path, '/styles/drimage_improved_')) {
       $config = $this->configFactory->get('drimage_improved.settings');
       $directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
-      // Remove the directory path from the path.
-      $path = str_replace('/' . $directory_path, '', $path);
+      // Remove only the first occurrence of the directory path.
+      if (str_contains($path, '/' . $directory_path)) {
+        $path = substr_replace($path, '', strpos($path, '/' . $directory_path), strlen('/' . $directory_path));
+      }
       $parts = explode('/', $path);
       $style = $parts[2];
       // Split style and get width and height.
