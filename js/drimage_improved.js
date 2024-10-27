@@ -247,6 +247,68 @@
               imgUrl = imgUrl + ".webp";
             }
             imgUrl = drupalSettings.path.baseUrl + imgUrl;
+
+            setTimeout(async function() {
+              try {
+                // Use fetch to check if the image URL is valid before retrying.
+                await fetch(imgUrl, { method: 'HEAD' })
+                .then(function(response) {
+                  if (response.ok) {
+                    img.src = imgUrl;  // Retry loading only if the response is valid.
+                  }
+                  // No console warning log when response is not valid.
+                })
+                .catch(function(error) {
+                  // No console error log when checking image availability.
+                });
+              } catch (error) {
+                // Temporarily suppress console error messages related to 503 errors.
+                const originalConsoleError = console.error;
+                console.error = function (...args) {
+                  if (!args[0]?.includes('503') && !args[0]?.includes('ERR_ABORTED')) {
+                    originalConsoleError.apply(console, args); // Log only other errors.
+                  }
+                };
+
+                // Restore original console.error after this block.
+                setTimeout(() => {
+                  console.error = originalConsoleError;
+                }, 100);
+              }
+            }, 100);  // Retry after a delay of 100ms.
+
+
+             img.onerror =  function () {
+                setTimeout(async function() {
+                  try {
+                    // Use fetch to check if the image URL is valid before retrying.
+                    await fetch(imgUrl, { method: 'HEAD' })
+                    .then(function(response) {
+                      if (response.ok) {
+                        img.src = imgUrl;  // Retry loading only if the response is valid.
+                      }
+                      // No console warning log when response is not valid.
+                    })
+                    .catch(function(error) {
+                      // No console error log when checking image availability.
+                    });
+                  } catch (error) {
+                    // Temporarily suppress console error messages related to 503 errors.
+                    const originalConsoleError = console.error;
+                    console.error = function (...args) {
+                      if (!args[0]?.includes('503') && !args[0]?.includes('ERR_ABORTED')) {
+                        originalConsoleError.apply(console, args); // Log only other errors.
+                      }
+                    };
+    
+                    // Restore original console.error after this block.
+                    setTimeout(() => {
+                      console.error = originalConsoleError;
+                    }, 100);
+                  }
+                }, 100);  // Retry after a delay of 100ms.
+            };
+
             if (data.image_handling === 'background') {
               img.onload = function() {
                 el.classList.remove('is-loading');
@@ -271,6 +333,7 @@
       }
     }
   };
+
 
   // Declare a variable for the IntersectionObserver
   let observer;
