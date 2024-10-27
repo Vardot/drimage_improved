@@ -322,11 +322,11 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
     // Bail out if the image is not valid.
     $file = File::load($fid);
     if (!$file) {
-      throw new NotFoundHttpException((string) $this->t('Error generating image, file not found.'));
+      throw new NotFoundHttpException('Error generating image, file not found.');
     }
     $image = $this->imageFactory->get($file->getFileUri());
     if (!$image->isValid()) {
-      throw new NotFoundHttpException((string) $this->t('Error generating image, invalid file.'));
+      throw new NotFoundHttpException('Error generating image, invalid file.');
     }
 
     // Set a NULL error_msg to prevent PHP notices further on.
@@ -334,14 +334,14 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
 
     // Bail out if the arguments are not numbers.
     if (!is_numeric($width) || !is_numeric($height) || !is_numeric($fid)) {
-      $error_msg = $this->t('Error generating image, invalid parameters.');
+      $error_msg = 'Error generating image, invalid parameters.';
     }
 
     // The Javascript should have generated a nice size adhering to the
     // threshold and x/y up/down-scaling settings. Check if it actually did.
     // Return the fallback image if it didn't.
     if (!$this->checkRequestedDimensions($width, $height)) {
-      $error_msg = $this->t('Error generating image, invalid dimensions.');
+      $error_msg = 'Error generating image, invalid dimensions.';
     }
 
     // Check the provided iwc crop type if given. We need a check for the "-"
@@ -354,10 +354,10 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
       // image_widget_crop styles should never have a height.
       $height = 0;
       if (!$this->moduleHandler()->moduleExists('image_widget_crop')) {
-        $error_msg = $this->t('Image_widget_crop module is not active.');
+        $error_msg = 'Image_widget_crop module is not active.';
       }
       elseif (!$crop_type = \Drupal::entityTypeManager()->getStorage('crop_type')->load($iwc_id)) {
-        $error_msg = $this->t('Image_widget_crop type not found.');
+        $error_msg = 'Image_widget_crop type not found.';
       }
     }
 
@@ -365,7 +365,7 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
     $requested_dimensions = [0 => $width, 1 => $height];
     $image_style = $this->findImageStyle($requested_dimensions, $iwc_id);
     if (empty($image_style)) {
-      $error_msg = $this->t('Could not find matching image style.');
+      $error_msg = 'Could not find matching image style.';
     }
 
     // Variable translation to make the original imageStyle deliver method work.
@@ -400,7 +400,7 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
       return $this->deliver($request, $scheme, $image_style, $scheme);
     }
 
-    return new Response((string) $error_msg, 500);
+    return new Response($error_msg, 500);
   }
 
 }
