@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\drimage_improved\EventSubscriber;
+namespace Drupal\drimage_s3fs\EventSubscriber;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -16,9 +16,9 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Sunscribes to kernel request event so it handles non-exixting images.
+ * Subscribes to kernel request event so it handles non-existing images.
  */
-final class DrimageSubscriber implements EventSubscriberInterface {
+final class DrimageS3Subscriber implements EventSubscriberInterface {
 
   /**
    * The stream wrapper manager service.
@@ -94,15 +94,14 @@ final class DrimageSubscriber implements EventSubscriberInterface {
    *   The request event.
    */
   public function onKernelRequest(RequestEvent $event) {
-    // Check if the request contains with /styles/drimage_improved_.
+    // Check if the request contains /s3/files/.
     $path = $event->getRequest()->getPathInfo();
-    if (strpos($path, '/styles/drimage_improved_') && strpos($path, '/s3/files/') === FALSE) {
+
+    if (strpos($path, '/s3/files/') !== FALSE && strpos($path, '/styles/drimage_improved_')) {
       $config = $this->configFactory->get('drimage_improved.settings');
-      $directory_path = $this->streamWrapperManager->getViaScheme('public')->getDirectoryPath();
-      // Remove only the first occurrence of the directory path.
-      if (str_contains($path, '/' . $directory_path)) {
-        $path = substr_replace($path, '', strpos($path, '/' . $directory_path), strlen('/' . $directory_path));
-      }
+      $directory_path = 's3/files';
+      // Remove the directory path from the path.
+      $path = str_replace('/' . $directory_path, '', $path);
       $parts = explode('/', $path);
       $style = $parts[2];
       // Split style and get width and height.
