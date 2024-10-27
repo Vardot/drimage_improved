@@ -322,11 +322,11 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
     // Bail out if the image is not valid.
     $file = File::load($fid);
     if (!$file) {
-      throw new NotFoundHttpException($this->t('Error generating image, file not found.'));
+      throw new NotFoundHttpException((string) $this->t('Error generating image, file not found.'));
     }
     $image = $this->imageFactory->get($file->getFileUri());
     if (!$image->isValid()) {
-      throw new NotFoundHttpException($this->t('Error generating image, invalid file.'));
+      throw new NotFoundHttpException((string) $this->t('Error generating image, invalid file.'));
     }
 
     // Set a NULL error_msg to prevent PHP notices further on.
@@ -426,7 +426,7 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
             }
             else {
               // If the derivative does not exist, return a failed response.
-              $response = new Response($this->t('Error loading webp variant for image.'), 500);
+              $response = new Response((string) $this->t('Error loading webp variant for image.'), 500);
             }
           }
           $error = FALSE;
@@ -449,7 +449,7 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
       return $response;
     }
 
-    return new Response($error_msg, 500);
+    return new Response((string) $error_msg, 500);
   }
 
 }
