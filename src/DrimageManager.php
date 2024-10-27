@@ -371,7 +371,16 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
     // Variable translation to make the original imageStyle deliver method work.
     $image_uri = explode('://', $file->getFileUri());
     $scheme = $image_uri[0];
-    $request->query->set('file', $image_uri[1]);
+    $file_path = $image_uri[1];
+    $drimage_improved_config = $this->config('drimage_improved.settings');
+    if ($format === 'webp' && ($drimage_improved_config->get('core_webp') || $drimage_improved_config->get('imageapi_optimize_webp'))) {
+      // Check if image is originally a webp image.
+      $image_extension = pathinfo($file_path, PATHINFO_EXTENSION);
+      if ($image_extension !== 'webp') {
+        $file_path .= '.webp';
+      }
+    }
+    $request->query->set('file', $file_path);
 
     // Use the fallback image style if something went wrong.
     if (!empty($error_msg)) {
@@ -385,68 +394,10 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
     if (!empty($image_style)) {
       // Because drimage_improved does not use itok, we simulate it.
       if (!$this->config('image.settings')->get('allow_insecure_derivatives')) {
-        $image_uri = $image_uri[0] . '://' . $image_uri[1];
+        $image_uri = $scheme . '://' . $file_path;
         $request->query->set(IMAGE_DERIVATIVE_TOKEN, $image_style->getPathToken($image_uri));
       }
-
-      // Uncomment to test the loading effect:
-      // usleep(1000000);
-      // Give the browser back an image in the format it requested.
-      // This can be:
-      //    - webp through the imageapi_optimize_webp module
-      //    - or it will fall back to the default file in the filesystem for all other formats passed.
-      // @see: \Drupal\drimage_improved\PathProcessor\PathProcessorImageStyles::processInbound()
-      // @todo should probably override the deliver function to handle this properly.
-      //
-      // Added a looped try-catch construction to try and catch various deadlock issues.
-      // These are hard te debug and it is not totally clear where they emerge from also.
-      // 1 example: https://www.drupal.org/project/automated_crop/issues/3317597
-      $attempts = 0;
-      $error = TRUE;
-      while ($error && $attempts < 10) {
-        $attempts++;
-        try {
-          $response = $this->deliver($request, $scheme, $image_style, $scheme);
-          $drimage_improved_config = $this->config('drimage_improved.settings');
-          if ($format === 'webp' && ($drimage_improved_config->get('core_webp') || $drimage_improved_config->get('imageapi_optimize_webp'))) {
-            // Check if image is originally a webp image.
-            $image_extension = pathinfo($image_uri, PATHINFO_EXTENSION);
-            if ($image_extension !== 'webp') {
-              $image_uri .= '.webp';
-            }
-            $webp_image_derivative_uri = $image_style->buildUri($image_uri);
-            if (file_exists($webp_image_derivative_uri)) {
-              $image = $this->imageFactory->get($webp_image_derivative_uri);
-              $uri = $image->getSource();
-              $headers = [
-                'Content-Type' => 'image/webp',
-                'Content-Length' => $image->getFileSize(),
-              ];
-              $response = new BinaryFileResponse($uri, 200, $headers, $scheme !== 'private');
-            }
-            else {
-              // If the derivative does not exist, return a failed response.
-              $response = new Response((string) $this->t('Error loading webp variant for image.'), 500);
-            }
-          }
-          $error = FALSE;
-        }
-        catch (\Exception $e) {
-          // Wait for a random bit of time (0,1-0,5s) to prevent concurrent failures from stacking again.
-          usleep(rand(100000, 500000));
-          $error = TRUE;
-        }
-      }
-
-      $maxage = $drimage_improved_config->get('cache_max_age');
-      if ($maxage === 0) {
-        $response->headers->set('Cache-Control', 'must-revalidate, no-cache, private');
-      }
-      elseif (is_int($maxage)) {
-        $response->setMaxAge($maxage);
-      }
-
-      return $response;
+      return $this->deliver($request, $scheme, $image_style, $scheme);
     }
 
     return new Response((string) $error_msg, 500);
