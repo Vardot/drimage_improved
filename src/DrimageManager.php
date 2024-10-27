@@ -406,7 +406,7 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
       while ($error && $attempts < 10) {
         $attempts++;
         try {
-          $response = $this->deliver($request, $scheme, $image_style, 'public');
+          $response = $this->deliver($request, $scheme, $image_style, $scheme);
           $drimage_improved_config = $this->config('drimage_improved.settings');
           if ($format === 'webp' && ($drimage_improved_config->get('core_webp') || $drimage_improved_config->get('imageapi_optimize_webp'))) {
             // Check if image is originally a webp image.
