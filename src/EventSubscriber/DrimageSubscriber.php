@@ -13,6 +13,7 @@ use Drupal\drimage_improved\DrimageManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -145,8 +146,8 @@ final class DrimageSubscriber implements EventSubscriberInterface {
         // Log an error message if the image is not found.
         $this->loggerFactory->error('Image not found: @uri', ['@uri' => $scheme . '://' . urldecode($file_name)]);
 
-        // Throw a 404 error.
-        return new Response('Error generating image, missing source file.', 404);
+        // Force Drupal to stop processing the request.
+        $event->setResponse(new Response('Error generating image, missing source file.', 404));
       }
 
       // Get the first (and presumably only) image entity.
@@ -157,12 +158,18 @@ final class DrimageSubscriber implements EventSubscriberInterface {
         // Log an error message if the fid is not valid.
         $this->loggerFactory->error('Invalid file ID for image: @uri', ['@uri' => $scheme . '://' . urldecode($file_name)]);
 
-        // Throw a 404 error.
-        return new Response('Error generating image, missing source file.', 404);
+        // Force Drupal to stop processing the request.
+        $event->setResponse(new Response('Error generating image, missing source file.', 404));
       }
 
-      // Deliver the image.
-      $this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) end($image)->id(), $iwc_id, $format);
+      try {
+        // Deliver the image.
+        $this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) $images->id(), $iwc_id, $format);
+      }
+      catch (NotFoundHttpException $exception) {
+        // Force Drupal to stop processing the request.
+        $event->setResponse(new Response($exception->getMessage(), 404));
+      }
     }
   }
 
