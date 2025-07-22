@@ -120,8 +120,8 @@ final class DrimageS3Subscriber implements EventSubscriberInterface {
         $height = $style_parts[4];
       }
       else {
-        $width = $style_parts[2];
-        $height = $style_parts[3];
+        $width = $style_parts[1];
+        $height = $style_parts[2];
       }
 
       // Get the file path.
