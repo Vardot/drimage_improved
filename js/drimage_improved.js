@@ -81,6 +81,10 @@
       size[1] = size[0] / data.aspect_ratio.width * data.aspect_ratio.height;
     }
 
+    if (data.image_handling === 'container_size') {
+      size[1] = el.offsetHeight;
+    }
+
     // Fix blurry images when using background cover option.
     if (data.image_handling === 'background' && data.background.size === 'cover') {
       // Example: available space = 200w, 700h, original image = 1600w, 900h

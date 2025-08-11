@@ -32,6 +32,7 @@ class DrImageFormatter extends ImageFormatter {
       'scale' => $this->t('Scale'),
       'aspect_ratio' => $this->t('Fixed aspect ratio crop'),
       'background' => $this->t('Background image'),
+      'container_size' => $this->t('Container size'),
     ];
     if (\Drupal::moduleHandler()->moduleExists('image_widget_crop')) {
       $options['iwc'] = $this->t('Image widget crop');
@@ -83,6 +84,9 @@ class DrImageFormatter extends ImageFormatter {
       'background' => [
         '#description' => $this->t("Put the image in as background-image. This is useful for images that need a fixed height; images that need cropping to the theme's CSS."),
       ],
+      'container_size' => [
+        '#description' => $this->t("The image will be scaled and cropped to an exact size of drimage container."),
+      ]
     ];
 
     $element['aspect_ratio'] = [
