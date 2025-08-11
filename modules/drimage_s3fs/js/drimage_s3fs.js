@@ -1,4 +1,5 @@
 (function (document, Drupal, drupalSettings) {
+
   'use strict';
 
   Drupal.drimage_improved = {};
@@ -53,7 +54,7 @@
   };
 
   Drupal.drimage_improved.fetchData = function (el) {
-    var data = JSON.parse(el.getAttribute("data-drimage_improved"));
+    var data = JSON.parse(el.getAttribute("data-drimage-improved"));
     data.upscale = parseInt(data.upscale);
     data.downscale = parseInt(data.downscale);
     data.threshold = parseInt(data.threshold);
@@ -206,6 +207,7 @@
             el.classList.add('is-loading');
             el.setAttribute('data-w', size[0]);
             el.setAttribute('data-h', size[1]);
+
             var imgUrl = data.subdir + '/styles/drimage_improved_';
             if (data.focal_point) {
               imgUrl += 'focal_';
@@ -245,14 +247,81 @@
               imgUrl = imgUrl + ".webp";
             }
             imgUrl = drupalSettings.path.baseUrl + imgUrl;
-            
+
             var s3ImgUrl = imgUrl.replace('/s3/files/', 's3://');
             var fileExistsArray = data.file_exists;
             fileExistsArray = fileExistsArray.map(url => encodeURI(url.replace(/\\\//g, '/')));
             if (fileExistsArray.includes(s3ImgUrl)) {
               // Replace the URL with the new domain
-              imgUrl = imgUrl.replace("/s3/files", data.s3_host);
+              var image_host = "";
+              if (data.use_cname) {
+                image_host = "https://" + data.s3_host;
+              }
+              else {
+                image_host = data.s3_host;
+              }
+
+              imgUrl = imgUrl.replace("/s3/files", image_host);
             }
+
+            setTimeout(async function() {
+              try {
+                // Use fetch to check if the image URL is valid before retrying.
+                await fetch(imgUrl, { method: 'HEAD',mode: 'no-cors' })
+                .then(function(response) {
+                  if (response.ok) {
+                    img.src = imgUrl;  // Retry loading only if the response is valid.
+                  }
+                  // No console warning log when response is not valid.
+                })
+                .catch(function(error) {
+                  // No console error log when checking image availability.
+                });
+              } catch (error) {
+                // Temporarily suppress console error messages related to 503 errors.
+                const originalConsoleError = console.error;
+                console.error = function (...args) {
+                  if (!args[0]?.includes('503') && !args[0]?.includes('ERR_ABORTED')) {
+                    originalConsoleError.apply(console, args); // Log only other errors.
+                  }
+                };
+                // Restore original console.error after this block.
+                setTimeout(() => {
+                  console.error = originalConsoleError;
+                }, 100);
+              }
+            }, 100);  // Retry after a delay of 100ms.
+
+
+             img.onerror =  function () {
+                setTimeout(async function() {
+                  try {
+                    // Use fetch to check if the image URL is valid before retrying.
+                    await fetch(imgUrl, { method: 'HEAD',mode: 'no-cors' })
+                    .then(function(response) {
+                      if (response.ok) {
+                        img.src = imgUrl;  // Retry loading only if the response is valid.
+                      }
+                      // No console warning log when response is not valid.
+                    })
+                    .catch(function(error) {
+                      // No console error log when checking image availability.
+                    });
+                  } catch (error) {
+                    // Temporarily suppress console error messages related to 503 errors.
+                    const originalConsoleError = console.error;
+                    console.error = function (...args) {
+                      if (!args[0]?.includes('503') && !args[0]?.includes('ERR_ABORTED')) {
+                        originalConsoleError.apply(console, args); // Log only other errors.
+                      }
+                    };
+                    // Restore original console.error after this block.
+                    setTimeout(() => {
+                      console.error = originalConsoleError;
+                    }, 100);
+                  }
+                }, 100);  // Retry after a delay of 100ms.
+            };
 
             if (data.image_handling === 'background') {
               img.onload = function() {
@@ -278,6 +347,7 @@
       }
     }
   };
+
 
   // Declare a variable for the IntersectionObserver
   let observer;

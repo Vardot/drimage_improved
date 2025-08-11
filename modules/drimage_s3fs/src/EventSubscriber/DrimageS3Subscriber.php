@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Drupal\Core\Cache\Cache;
 
 /**
  * Subscribes to kernel request event so it handles non-existing images.
@@ -162,6 +163,13 @@ final class DrimageS3Subscriber implements EventSubscriberInterface {
 
       // Deliver the image.
       $this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) end($image)->id(), $iwc_id, $format);
+
+      // Add a cache tag based on the file ID to allow for targeted cache invalidation.
+      $tags[] = 'file:' . $images->id();
+
+      // Invalidate the cache for the specified tags to ensure updated content is loaded.
+      Cache::invalidateTags($tags);
+
     }
   }
 

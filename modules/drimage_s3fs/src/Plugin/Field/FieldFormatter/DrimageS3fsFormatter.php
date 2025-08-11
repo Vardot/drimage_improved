@@ -143,8 +143,10 @@ class DrimageS3fsFormatter extends DrImageFormatter implements ContainerFactoryP
     $s3_config = $this->configFactory->get('s3fs.settings')->get();
 
     $host = "";
+    $use_cname = FALSE;
     if ($s3_config['use_cname'] && !empty($s3_config['domain'])) {
       $host = $s3_config['domain'];
+      $use_cname = TRUE;
     }
     else {
       try {
@@ -165,14 +167,15 @@ class DrimageS3fsFormatter extends DrImageFormatter implements ContainerFactoryP
         $elements[$delta]['#theme'] = 'drimage_s3_formatter';
         $elements[$delta]['#item_attributes']['class'] = ['s3_drimage'];
         // Get the file name from the element data.
-        $file_name = $element['#data']['filename']; 
+        $file_name = $element['#data']['filename'];
         $elements[$delta]['#data']['subdir'] = 's3/files';
         // Query the database to check if the file exists in the s3fs_file table.
         $connection = $this->database;
         $query = $connection->select('s3fs_file', 's')
           ->fields('s', ['uri'])
           ->condition('uri', '%' . $connection->escapeLike($file_name) . '%', 'LIKE')
-          ->condition('uri', '%' . 'drimage_improved' . '%', 'LIKE')
+          ->condition('uri', '%drimage_improved%', 'LIKE')
+          ->range(0, 32)
           ->execute();
         // Fetch all URIs that match the query.
         $file_exists = [];
@@ -184,8 +187,10 @@ class DrimageS3fsFormatter extends DrImageFormatter implements ContainerFactoryP
 
         // Add the host to the element.
         $elements[$delta]['#data']['s3_host'] = $host;
+        $elements[$delta]['#data']['use_cname'] = $use_cname;
       }
     }
+
     return $elements;
   }
 
