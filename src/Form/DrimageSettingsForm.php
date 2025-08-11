@@ -3,6 +3,7 @@
 namespace Drupal\drimage_improved\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Datetime\DateFormatterInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\ConfigFormBase;
@@ -55,11 +56,12 @@ class DrimageSettingsForm extends ConfigFormBase {
    */
   public function __construct(
     ConfigFactoryInterface $config_factory,
+    TypedConfigManagerInterface $typedConfigManager,
     DateFormatterInterface $date_formatter,
     ModuleHandlerInterface $module_handler,
     ImageToolkitManager $image_toolkit_manager,
   ) {
-    parent::__construct($config_factory);
+    parent::__construct($config_factory, $typedConfigManager);
     $this->dateFormatter = $date_formatter;
     $this->moduleHandler = $module_handler;
     $this->imageToolkitManager = $image_toolkit_manager;
@@ -71,6 +73,7 @@ class DrimageSettingsForm extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
+      $container->get('config.typed'),
       $container->get('date.formatter'),
       $container->get('module_handler'),
       $container->get('image.toolkit.manager')
