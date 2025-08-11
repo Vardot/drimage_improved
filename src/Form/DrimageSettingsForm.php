@@ -263,6 +263,37 @@ class DrimageSettingsForm extends ConfigFormBase {
       '#description' => t('The maximum time an image derivative can be cached. This should be disabled if you configured your server to serve existing image derivatives without bootstrapping Drupal (in case of Apache servers, using the htaccess.prepend.txt file provided by this module). In that case, caching headers will be set by the server instead.'),
     ];
 
+    $form['placeholder'] = [
+      '#type' => 'fieldset',
+      '#title' => t('Placeholder'),
+    ];
+
+    $form['placeholder']['placeholder_color'] = [
+      '#type' => 'textfield',
+      '#title' => t('Color placeholder'),
+      '#default_value' => $this->config('drimage_improved.settings')->get('placeholder_color'),
+      '#description' => t('Background color to appear before loading the image.<br>In HEX format.'),
+    ];
+
+    $form['placeholder']['placeholder_image_switch'] = [
+      '#type' => 'checkbox',
+      '#title' => t('Use image as placeholder'),
+      '#default_value' => $this->config('drimage_improved.settings')->get('placeholder_image_switch'),
+      '#description' => t('Use an image instead of a color to appear before loading the image.'),
+    ];
+
+    $form['placeholder']['placeholder_image'] = [
+      '#type' => 'textfield',
+      '#title' => t('Image placeholder'),
+      '#default_value' => $this->config('drimage_improved.settings')->get('placeholder_image'),
+      '#description' => t('Path to the image.'),
+      '#states' => [
+        'visible' => [
+          ':input[name="placeholder_image_switch"]' => ['checked' => TRUE],
+        ],
+      ],
+    ];
+
     // @deprecated: only show if it was enabled explicitly.
     if ($this->config('drimage_improved.settings')->get('legacy_lazyload')) {
       $form['legacy_lazyload'] = [
@@ -285,6 +316,12 @@ class DrimageSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+
+      // Validate HEX color code or transparent
+      if (!preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/', $form_state->getValue('placeholder_color'))) {
+        $form_state->setErrorByName('placeholder_color', $this->t('The placeholder color must be a valid HEX color code (e.g., #ffffff).'));
+        return;
+      }
   }
 
   /**
@@ -303,6 +340,9 @@ class DrimageSettingsForm extends ConfigFormBase {
       ->set('lazy_offset', $form_state->getValue('lazy_offset'))
       ->set('fallback_style', $form_state->getValue('fallback_style'))
       ->set('cache_max_age', $form_state->getValue('cache_max_age'))
+      ->set('placeholder_color', $form_state->getValue('placeholder_color'))
+      ->set('placeholder_image_switch', $form_state->getValue('placeholder_image_switch'))
+      ->set('placeholder_image', $form_state->getValue('placeholder_image'))
       ->set('legacy_lazyload', $form_state->getValue('legacy_lazyload'))
       ->save();
     \Drupal::messenger()->addMessage($this->t('Drimage Settings have been successfully saved.'));

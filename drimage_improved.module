@@ -39,6 +39,9 @@ function drimage_improved_theme() {
         'width' => NULL,
         'height' => NULL,
         'data' => NULL,
+        'placeholder_color' => NULL,
+        'placeholder_image' => NULL,
+        'placeholder_image_switch' => NULL,
       ],
     ],
   ];

@@ -35,6 +35,15 @@ drimage_improved.settings:
     cache_max_age:
       type: integer
       label: 'Cache maximum age'
+    placeholder_color:
+      type: string
+      label: 'Color placeholder'
+    placeholder_image_switch:
+      type: boolean
+      label: 'Use image as placeholder'
+    placeholder_image:
+      type: string
+      label: 'Image placeholder'
     legacy_lazyload:
       type: boolean
       label: 'Use drimage_improved JS lazyloader'
