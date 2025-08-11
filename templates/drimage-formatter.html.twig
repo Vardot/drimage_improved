@@ -35,7 +35,7 @@
   {% if core_webp or imageapi_optimize_webp %}
     <source data-format="webp" srcset="{{ dummy_image }}" type="image/webp">
   {% endif %}
-    <img src="{{ dummy_image }}" width="{{ width }}" height="{{ height }}" alt="{{ alt }}" class="drimage-image" />
+    <img src="{{ dummy_image }}" width="{{ width }}" height="{{ height }}" alt="{{ alt }}"{% if title %}title="{{ title }}"{% endif %} class="drimage-image" />
 
   {% if url %}
   </picture></a>
@@ -44,6 +44,6 @@
   {% endif %}
 
   <noscript>
-    <img src="/{{ data.subdir }}/{{ data.original_source }}" alt="{{ alt }}" width="{{ data.original_width }}" height="{{ data.original_height }}" loading="lazy">
+    <img src="/{{ data.subdir }}/{{ data.original_source }}" alt="{{ alt }}"{% if title %} title="{{ title }}"{% endif %} width="{{ data.original_width }}" height="{{ data.original_height }}" loading="lazy">
   </noscript>
 </div>

@@ -69,6 +69,7 @@ class DrImageUriFormatter extends DrImageFormatter {
       $elements[$delta]['#core_webp'] = $config->get('core_webp');
       $elements[$delta]['#imageapi_optimize_webp'] = $config->get('imageapi_optimize_webp');
       $elements[$delta]['#alt'] = $file->getMetaData('alt');
+      $elements[$delta]['#title'] = $file->getMetaData('title');
       $elements[$delta]['#placeholder_color'] = $config->get('placeholder_color');
       $elements[$delta]['#placeholder_image'] = $config->get('placeholder_image');
       $elements[$delta]['#placeholder_image_switch'] = $config->get('placeholder_image_switch');

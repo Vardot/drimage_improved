@@ -36,6 +36,7 @@ function drimage_improved_theme() {
         'imageapi_optimize_webp' => NULL,
         'url' => NULL,
         'alt' => NULL,
+        'title' => NULL,
         'width' => NULL,
         'height' => NULL,
         'data' => NULL,
