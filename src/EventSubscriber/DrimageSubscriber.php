@@ -108,6 +108,9 @@ final class DrimageSubscriber implements EventSubscriberInterface {
       $style = $parts[2];
       // Split style and get width and height.
       $style_parts = explode('_', $style);
+      // Remove the 'improved' part from $style_parts and re-index.
+      unset($style_parts[1]);
+      $style_parts = array_values($style_parts);
       $scheme = $parts[3];
       $iwc_id = '-';
       if ($this->moduleHandler->moduleExists('image_widget_crop') && isset($style_parts[3])) {
