@@ -121,8 +121,8 @@ final class DrimageSubscriber implements EventSubscriberInterface {
         $iwc_id = implode('_', array_slice($style_parts, 3));
       }
       elseif ($this->moduleHandler->moduleExists('focal_point')) {
-        $width = $style_parts[3];
-        $height = $style_parts[4];
+        $width = $style_parts[2];
+        $height = $style_parts[3];
       }
       else {
         $width = $style_parts[1];
