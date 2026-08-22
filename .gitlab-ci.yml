@@ -499,3 +499,46 @@ create-reports:
     paths:
       - tests/reports/
   allow_failure: false
+
+# =============================================================================
+# GitLab Pages - the documentation site
+# =============================================================================
+#
+# Builds the Material for MkDocs site under `docs/` and publishes it to
+# https://project.pages.drupalcode.org/drimage_improved/. Only the default
+# branch publishes, so a merge request never replaces the live documentation.
+#
+# `--strict` turns a broken internal link or a missing nav target into a failed
+# job, which is the point: documentation that does not build is not documentation.
+pages:
+  stage: report
+  image: python:3.12-slim
+  needs: []
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  before_script:
+    - pip install --quiet "mkdocs-material>=9,<10" "pymdown-extensions>=10,<11"
+  script:
+    - mkdocs build --strict --site-dir public
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
+  allow_failure: false
+
+# Builds the documentation on every branch and merge request, so a broken page
+# fails review instead of failing after the merge.
+docs:build:
+  stage: validate
+  image: python:3.12-slim
+  needs: []
+  before_script:
+    - pip install --quiet "mkdocs-material>=9,<10" "pymdown-extensions>=10,<11"
+  script:
+    - mkdocs build --strict --site-dir public
+  artifacts:
+    when: on_failure
+    paths:
+      - public
+    expire_in: 1 day
+  allow_failure: false

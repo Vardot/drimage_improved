@@ -6,6 +6,7 @@ CONTENTS OF THIS FILE
  * Recommended modules
  * Installation
  * Configuration
+ * Documentation
  * Troubleshooting
  * FAQ
  * Maintainers
@@ -64,6 +65,17 @@ CONFIGURATION
    diskspace) you can set a threshold pixel value for 2 image styles to
    minimally differ at /admin/config/media/drimage_improved. Resulting images will be
    up-/downscaled in the browser.
+
+
+DOCUMENTATION
+-------------
+
+ * Full documentation lives in the docs/ folder of this repository and is published at:
+   https://project.pages.drupalcode.org/drimage_improved/
+
+ * Start with docs/index.md. It is split per audience: setting up image fields and media
+   references, the settings on /admin/config/media/drimage_improved, and an architecture
+   and testing overview for developers.
 
 
 TROUBLESHOOTING

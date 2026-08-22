@@ -100,7 +100,24 @@
     "weseze",
     "Jurgen",
     "filemime",
-    "fetchpriority"
+    "fetchpriority",
+    "mkdocs",
+    "pymdown",
+    "Gherkin",
+    "Cucumber",
+    "Playwright",
+    "Lighthouse",
+    "PHPCS",
+    "PHPStan",
+    "CSpell",
+    "ESLint",
+    "Stylelint",
+    "PHPUnit",
+    "prepend",
+    "teaser",
+    "teasers",
+    "Composer",
+    "composer"
   ],
   "ignoreWords": [
     "dimentions"
