@@ -10,7 +10,7 @@ The formatter works on any field of type **Image**, on any entity type.
 3. Open the settings (the gear icon) to choose how the image is handled.
 4. **Update**, then **Save**.
 
-![The formatter settings, with the image handling options](../images/formatter-settings.webp)
+![The formatter settings, with the image handling options](https://www.drupal.org/files/issues/2026-08-22/drimage-improved-03-formatter-settings.png)
 
 ## Settings on the formatter
 

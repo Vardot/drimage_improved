@@ -16,7 +16,7 @@ lives one level deeper, on the media type.
 2. Set the **Image** field's **Format** to **Dynamic Responsive Image**.
 3. Save.
 
-![The Image media type rendering its image field through the formatter](../images/manage-display-media.webp)
+![The Image media type rendering its image field through the formatter](https://www.drupal.org/files/issues/2026-08-22/drimage-improved-04-manage-display-media-type.png)
 
 ### 2. On the content type
 

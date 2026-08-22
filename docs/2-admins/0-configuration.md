@@ -3,7 +3,7 @@
 One settings page, at **Configuration > Media > Drimage settings**
 (`/admin/config/media/drimage_improved`). It needs the *administer image styles* permission.
 
-![The Drimage settings form](../images/settings.webp)
+![The Drimage settings form](https://www.drupal.org/files/issues/2026-08-22/drimage-improved-01-settings.png)
 
 ## Controlling how many image styles exist
 

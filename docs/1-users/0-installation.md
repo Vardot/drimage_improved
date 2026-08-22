@@ -31,12 +31,12 @@ drush en drimage_improved
 2. Set the **Format** of your image field to **Dynamic Responsive Image**.
 3. Save.
 
-![The Article display with the Dynamic Responsive Image formatter selected](../images/manage-display-node.webp)
+![The Article display with the Dynamic Responsive Image formatter selected](https://www.drupal.org/files/issues/2026-08-22/drimage-improved-02-manage-display-content-type.png)
 
 View a node with that field. The image now loads at a width that matches the space it
 occupies, and the derivative is created on the first request.
 
-![An article rendering an image field and a referenced media item](../images/rendered-output.webp)
+![An article rendering an image field and a referenced media item](https://www.drupal.org/files/issues/2026-08-22/drimage-improved-05-rendered-article.png)
 
 If your content references **media** instead of holding an image field directly, configure the
 media type's display: see [Media References](2-media-references.md).
