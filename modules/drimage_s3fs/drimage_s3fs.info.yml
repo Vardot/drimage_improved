@@ -6,4 +6,3 @@ package: Media
 dependencies:
   - s3fs:s3fs
   - drimage_improved:drimage_improved
-
