@@ -91,13 +91,16 @@ class DrimageStageFileProxySubscriber implements EventSubscriberInterface {
    */
   public function checkFileOrigin(RequestEvent $event): void {
 
-    // Process to request uri, mainly to filter out language prefixes.
+    // Process the request uri, mainly to filter out language prefixes. Inbound
+    // processors write to the request they are given, so hand them a clone:
+    // core's file path processor sets a "file" query parameter, which breaks
+    // routing for private file requests.
     $request_uri = $this->pathProcessorManager->processInbound(
       $event->getRequest()->getRequestUri(),
-      $event->getRequest()
+      clone $event->getRequest()
     );
 
-    if (substr($request_uri, 0, 8) === '/drimage_improved') {
+    if (str_starts_with($request_uri, '/drimage_improved/')) {
       [,,,, $fid] = explode('/', $request_uri);
       $file = File::load($fid);
 
