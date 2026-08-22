@@ -112,21 +112,16 @@ final class DrimageSubscriber implements EventSubscriberInterface {
       unset($style_parts[1]);
       $style_parts = array_values($style_parts);
       $scheme = $parts[3];
+      // Style names are drimage_improved_[focal_]WIDTH_HEIGHT[_CROP_TYPE]: read
+      // the dimensions from the name itself so that having image_widget_crop
+      // installed never breaks focal-point or plain styles.
+      $offset = ($style_parts[1] ?? '') === 'focal' ? 2 : 1;
+      $width = $style_parts[$offset] ?? NULL;
+      $height = $style_parts[$offset + 1] ?? NULL;
       $iwc_id = '-';
-      if ($this->moduleHandler->moduleExists('image_widget_crop') && isset($style_parts[3])) {
-        $width = $style_parts[1];
-        $height = $style_parts[2];
-        // Need to implode all parts from index 3 and further to get the correct iwc_id.
-        // The image widget crop id itself can contain underscores.
-        $iwc_id = implode('_', array_slice($style_parts, 3));
-      }
-      elseif ($this->moduleHandler->moduleExists('focal_point')) {
-        $width = $style_parts[2];
-        $height = $style_parts[3];
-      }
-      else {
-        $width = $style_parts[1];
-        $height = $style_parts[2];
+      if ($this->moduleHandler->moduleExists('image_widget_crop') && isset($style_parts[$offset + 2])) {
+        // The crop type id itself can contain underscores.
+        $iwc_id = implode('_', array_slice($style_parts, $offset + 2));
       }
 
       // Get the file path.
