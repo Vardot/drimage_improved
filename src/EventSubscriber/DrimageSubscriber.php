@@ -134,7 +134,7 @@ final class DrimageSubscriber implements EventSubscriberInterface {
         }
       }
       // Redirect to drimage_improved.image route.
-      $image = $this->entityTypeManager->getStorage('file')->loadByProperties(['uri' => $scheme . '://' . urldecode($file_name)]);
+      $image = $this->entityTypeManager->getStorage('file')->loadByProperties(['uri' => $scheme . '://' . rawurldecode($file_name)]);
       $filename = end($parts);
       $filename_parts = explode('.', $filename);
       $format = end($filename_parts);
@@ -142,7 +142,7 @@ final class DrimageSubscriber implements EventSubscriberInterface {
       // Check if the image was found.
       if (empty($image)) {
         // Log an error message if the image is not found.
-        $this->loggerFactory->error('Image not found: @uri', ['@uri' => $scheme . '://' . urldecode($file_name)]);
+        $this->loggerFactory->error('Image not found: @uri', ['@uri' => $scheme . '://' . rawurldecode($file_name)]);
 
         // Force Drupal to stop processing the request.
         $event->setResponse(new Response('Error generating image, missing source file.', 404));
@@ -155,7 +155,7 @@ final class DrimageSubscriber implements EventSubscriberInterface {
       // Check if the image entity is valid and has a valid ID.
       if (!$images || !$images->id()) {
         // Log an error message if the fid is not valid.
-        $this->loggerFactory->error('Invalid file ID for image: @uri', ['@uri' => $scheme . '://' . urldecode($file_name)]);
+        $this->loggerFactory->error('Invalid file ID for image: @uri', ['@uri' => $scheme . '://' . rawurldecode($file_name)]);
 
         // Force Drupal to stop processing the request.
         $event->setResponse(new Response('Error generating image, missing source file.', 404));

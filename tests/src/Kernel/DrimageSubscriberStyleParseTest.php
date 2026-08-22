@@ -89,4 +89,20 @@ class DrimageSubscriberStyleParseTest extends KernelTestBase {
     $this->assertSame(404, $response->getStatusCode());
   }
 
+  /**
+   * A file name containing a plus symbol still resolves.
+   *
+   * The urldecode() call turned "+" into a space, so the file lookup missed and no
+   * derivative was produced for names like "my+file.png" (issue #3545688).
+   */
+  public function testPlusInFileNameResolves(): void {
+    $source = current($this->getTestFiles('image'));
+    \Drupal::service('file_system')->saveData(file_get_contents($source->uri), 'public://drimage/my+file.png', FileExists::Replace);
+    File::create(['uri' => 'public://drimage/my+file.png', 'status' => 1])->save();
+
+    $response = $this->request('drimage_improved_focal_320_0', 'drimage/my+file.png')->getResponse();
+    $this->assertNotNull($response);
+    $this->assertSame(200, $response->getStatusCode());
+  }
+
 }
