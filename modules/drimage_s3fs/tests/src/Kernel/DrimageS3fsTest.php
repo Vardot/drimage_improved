@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drimage_s3fs\Kernel;
 
+use Drupal\drimage_s3fs\Hook\DrimageS3fsHooks;
 use Drupal\KernelTests\KernelTestBase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -46,7 +47,7 @@ class DrimageS3fsTest extends KernelTestBase {
    */
   public function testFormatterAndTheme(): void {
     $this->assertTrue($this->container->get('plugin.manager.field.formatter')->hasDefinition('drimage_s3fs'));
-    $this->assertArrayHasKey('drimage_s3_formatter', drimage_s3fs_theme());
+    $this->assertArrayHasKey('drimage_s3_formatter', \Drupal::service(DrimageS3fsHooks::class)->theme());
   }
 
   /**

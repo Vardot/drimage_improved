@@ -6,6 +6,7 @@ namespace Drupal\Tests\drimage_improved\Kernel;
 
 use Drupal\drimage_improved\Controller\ImageStyleListBuilder;
 use Drupal\drimage_improved\Controller\ImageStyleWithPipelineListBuilder;
+use Drupal\drimage_improved\Hook\DrimageImprovedHooks;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -27,7 +28,7 @@ class DrimageHooksTest extends KernelTestBase {
    * Hook_theme() registers the drimage_formatter theme hook.
    */
   public function testHookThemeRegistersFormatter(): void {
-    $theme = drimage_improved_theme();
+    $theme = \Drupal::service(DrimageImprovedHooks::class)->theme();
     $this->assertArrayHasKey('drimage_formatter', $theme);
     $this->assertArrayHasKey('data', $theme['drimage_formatter']['variables']);
     $this->assertArrayHasKey('core_webp', $theme['drimage_formatter']['variables']);

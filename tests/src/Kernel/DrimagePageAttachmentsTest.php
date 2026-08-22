@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Drupal\Tests\drimage_improved\Kernel;
 
+use Drupal\drimage_improved\Hook\DrimageImprovedHooks;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\KernelTests\KernelTestBase;
 
 /**
- * Tests hook_drimage_improved_page_attachments() dimension parsing.
+ * Tests the Drimage page attachments dimension parsing.
  *
  * Covers the drupalSettings dimensions the front-end JS reads, the focal_point
  * name handling, the scale-only skip, and the injected no-JS style.
@@ -35,7 +36,7 @@ class DrimagePageAttachmentsTest extends KernelTestBase {
    */
   protected function attachments(): array {
     $attachments = [];
-    drimage_improved_page_attachments($attachments);
+    \Drupal::service(DrimageImprovedHooks::class)->pageAttachments($attachments);
     return $attachments;
   }
 

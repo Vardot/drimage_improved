@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Drupal\drimage_improved;
 
+use Drupal\Component\Utility\DeprecationHelper;
+use Drupal\image\ImageStyleInterface;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\Entity\File;
 use Drupal\image\Controller\ImageStyleDownloadController;
@@ -396,7 +398,8 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
       // Because drimage_improved does not use itok, we simulate it.
       if (!$this->config('image.settings')->get('allow_insecure_derivatives')) {
         $image_uri = $scheme . '://' . $file_path;
-        $request->query->set(IMAGE_DERIVATIVE_TOKEN, $image_style->getPathToken($image_uri));
+        $token = DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '11.4.0', fn() => ImageStyleInterface::TOKEN, fn() => IMAGE_DERIVATIVE_TOKEN);
+        $request->query->set($token, $image_style->getPathToken($image_uri));
       }
       return $this->deliver($request, $scheme, $image_style, $scheme);
     }
