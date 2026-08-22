@@ -70,8 +70,12 @@ CONFIGURATION
 DOCUMENTATION
 -------------
 
- * Full documentation lives in the docs/ folder of this repository and is published at:
+ * Full documentation lives in the docs/ folder of this repository.
+
+ * It is also published with GitLab Pages. This project serves Pages from a generated
+   domain, so the readable address redirects there:
    https://project.pages.drupalcode.org/drimage_improved/
+   The exact domain is listed on the repository under Deploy > Pages.
 
  * Start with docs/index.md. It is split per audience: setting up image fields and media
    references, the settings on /admin/config/media/drimage_improved, and an architecture

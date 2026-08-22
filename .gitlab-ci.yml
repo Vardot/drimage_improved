@@ -504,8 +504,10 @@ create-reports:
 # GitLab Pages - the documentation site
 # =============================================================================
 #
-# Builds the Material for MkDocs site under `docs/` and publishes it to
-# https://project.pages.drupalcode.org/drimage_improved/. Only the default
+# Builds the Material for MkDocs site under `docs/` and publishes it with GitLab
+# Pages. This project has unique Pages domains enabled, so the site is served
+# from a generated hostname and https://project.pages.drupalcode.org/drimage_improved/
+# redirects to it; the exact domain is under Deploy > Pages. Only the default
 # branch publishes, so a merge request never replaces the live documentation.
 #
 # `--strict` turns a broken internal link or a missing nav target into a failed
