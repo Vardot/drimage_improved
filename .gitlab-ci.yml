@@ -40,6 +40,32 @@ workflow:
     - if: $CI_COMMIT_TAG
 
 # ---------------------------------------------------------------------------
+# Shared helper
+# ---------------------------------------------------------------------------
+# Composer and npm pull their archives from api.github.com / codeload.github.com /
+# packagist / the npm registry, which intermittently answer `HTTP/2 504` or time out
+# with `curl error 28`. Composer's own internal retry gives up and then reports
+# "Source fallback is disabled. Not trying alternative sources.", which fails the
+# whole pipeline on an outage that has nothing to do with this module.
+#
+# `retry_net` retries ONLY dependency-fetch commands, three times with a growing
+# pause, and still fails the job if the last attempt fails. Nothing else is ever
+# wrapped: no linter, no test, no assertion is retried or suppressed.
+.retry_net: &retry_net |
+  set -e
+  retry_net() {
+    for attempt in 1 2 3; do
+      if "$@"; then
+        return 0
+      fi
+      echo "network attempt $attempt failed; retrying in $((attempt * 15))s..."
+      sleep $((attempt * 15))
+    done
+    echo "still failing after 3 attempts."
+    return 1
+  }
+
+# ---------------------------------------------------------------------------
 # build
 # ---------------------------------------------------------------------------
 build:composer-validate:
@@ -55,10 +81,11 @@ phpcs:
   stage: validate
   image: public.ecr.aws/docker/library/php:8.3-cli
   before_script:
+    - *retry_net
     - apt-get update -y > /dev/null && apt-get install -y -qq git unzip > /dev/null
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     - composer global config --no-plugins allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
-    - composer global require --no-interaction --no-progress drupal/coder:^8.3 dealerdirect/phpcodesniffer-composer-installer:^1
+    - retry_net composer global require --no-interaction --no-progress drupal/coder:^8.3 dealerdirect/phpcodesniffer-composer-installer:^1
     - export PATH="$HOME/.composer/vendor/bin:$PATH"
   script:
     - phpcs --standard=.phpcs.xml
@@ -68,16 +95,17 @@ phpstan:
   stage: validate
   image: public.ecr.aws/docker/library/php:8.3-cli
   before_script:
+    - *retry_net
     - apt-get update -y > /dev/null && apt-get install -y -qq git unzip > /dev/null
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    - composer create-project drupal/recommended-project:~$DRUPAL_CORE /drupal --no-interaction --no-install
+    - retry_net composer create-project drupal/recommended-project:~$DRUPAL_CORE /drupal --no-interaction --no-install
     - cd /drupal
     - composer config --no-plugins allow-plugins true
     - composer config minimum-stability dev
     # focal_point is a soft integration point for Drimage's derivatives; pull it
     # so phpstan-drupal can resolve the classes the module references.
-    - composer require --no-interaction --no-progress --ignore-platform-reqs -W mglaman/phpstan-drupal phpstan/extension-installer drush/drush drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop
-    - composer install --no-interaction --no-progress --ignore-platform-reqs
+    - retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W mglaman/phpstan-drupal phpstan/extension-installer drush/drush drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs
+    - retry_net composer install --no-interaction --no-progress --ignore-platform-reqs
     - mkdir -p web/modules/custom && cp -r "$CI_PROJECT_DIR" web/modules/custom/drimage_improved
   script:
     - cd /drupal
@@ -88,7 +116,8 @@ cspell:
   stage: validate
   image: public.ecr.aws/docker/library/node:20
   before_script:
-    - npm install -g cspell
+    - *retry_net
+    - retry_net npm install -g cspell
   script:
     - cspell lint . --no-progress
   allow_failure: false
@@ -100,8 +129,9 @@ eslint:
   stage: validate
   image: public.ecr.aws/docker/library/node:20
   before_script:
+    - *retry_net
     - apt-get update -y > /dev/null && apt-get install -y -qq git > /dev/null
-    - git clone --depth 1 --branch "$DRUPAL_CORE" https://git.drupalcode.org/project/drupal.git /core-src
+    - retry_net git clone --depth 1 --branch "$DRUPAL_CORE" https://git.drupalcode.org/project/drupal.git /core-src
     - cp /core-src/core/.eslintrc.json /core-src/core/.eslintrc.passing.json /core-src/core/.prettierrc.json ./ 2>/dev/null || true
     - cp /core-src/core/package.json ./core-package.json
     - npm install --no-audit --no-fund $(node -e "const d=require('./core-package.json').devDependencies;console.log(Object.entries(d).filter(([k])=>/eslint|babel|prettier/.test(k)).map(([k,v])=>k+'@'+v).join(' '))")
@@ -113,8 +143,9 @@ stylelint:
   stage: validate
   image: public.ecr.aws/docker/library/node:20
   before_script:
+    - *retry_net
     - apt-get update -y > /dev/null && apt-get install -y -qq git > /dev/null
-    - git clone --depth 1 --branch "$DRUPAL_CORE" https://git.drupalcode.org/project/drupal.git /core-src
+    - retry_net git clone --depth 1 --branch "$DRUPAL_CORE" https://git.drupalcode.org/project/drupal.git /core-src
     - cp /core-src/core/.stylelintrc.json ./ 2>/dev/null || true
     - cp /core-src/core/package.json ./core-package.json
     - npm install --no-audit --no-fund $(node -e "const d=require('./core-package.json').devDependencies;console.log(Object.entries(d).filter(([k])=>/stylelint/.test(k)).map(([k,v])=>k+'@'+v).join(' '))")
@@ -143,6 +174,7 @@ phpunit:
     MYSQL_DATABASE: "drupal"
     SIMPLETEST_DB: "mysql://root@mariadb/drupal"
   before_script:
+    - *retry_net
     - apt-get update -y > /dev/null && apt-get install -y -qq git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libwebp-dev default-mysql-client > /dev/null
     # --with-webp is REQUIRED, not cosmetic: this module renders a WebP <source>
     # in its <picture>, and the php:8.3-cli GD build has no WebP support unless it
@@ -151,12 +183,12 @@ phpunit:
     - docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp > /dev/null
     - docker-php-ext-install -j"$(nproc)" gd pdo_mysql zip > /dev/null
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-    - composer create-project drupal/recommended-project:~$DRUPAL_CORE /drupal --no-interaction --no-install
+    - retry_net composer create-project drupal/recommended-project:~$DRUPAL_CORE /drupal --no-interaction --no-install
     - cd /drupal
     - composer config --no-plugins allow-plugins true
     - composer config minimum-stability dev
-    - composer require --no-interaction --no-progress --ignore-platform-reqs -W "drupal/core-dev:~$DRUPAL_CORE" drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop
-    - composer install --no-interaction --no-progress --ignore-platform-reqs
+    - retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W "drupal/core-dev:~$DRUPAL_CORE" drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs
+    - retry_net composer install --no-interaction --no-progress --ignore-platform-reqs
     - mkdir -p web/modules/custom && cp -r "$CI_PROJECT_DIR" web/modules/custom/drimage_improved
   script:
     - cd /drupal
@@ -164,6 +196,7 @@ phpunit:
     - php vendor/phpunit/phpunit/phpunit -c web/core --group drimage_improved
         --log-junit "$CI_PROJECT_DIR/tests/reports/phpunit.junit.xml"
         web/modules/custom/drimage_improved/tests/src/Kernel
+        web/modules/custom/drimage_improved/modules/drimage_s3fs/tests/src/Kernel
   artifacts:
     when: always
     paths:
@@ -206,6 +239,7 @@ phpunit:
     # combined HTML + PDF report is rendered once, from all setups, by create-reports.
     VARBASE_E2E_REPORT_DISABLE: "1"
   before_script:
+    - *retry_net
     - apt-get update -y > /dev/null && apt-get install -y -qq git unzip curl gnupg libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libwebp-dev default-mysql-client > /dev/null
     # --with-webp is REQUIRED, not cosmetic: this module renders a WebP <source>
     # in its <picture>, and the php:8.3-cli GD build has no WebP support unless it
@@ -216,32 +250,17 @@ phpunit:
     - curl -fsSL https://deb.nodesource.com/setup_20.x | bash - > /dev/null && apt-get install -y -qq nodejs > /dev/null
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     # Build a plain Drupal site pinned to $DRUPAL_CORE. Composer fetches hundreds of
-    # archives from packagist / codeload.github.com and regularly loses one to a
-    # transient `curl error 28 ... Connection timed out`, especially with several of
-    # these jobs building at once. `composer_net` retries ONLY the dependency-fetch
-    # commands, up to three times, and still fails the job if the last attempt fails.
-    # Nothing else is wrapped: no linter, no test and no assertion is ever retried or
-    # suppressed.
+    # archives and regularly loses one to a transient network failure, especially with
+    # several of these jobs building at once - see the retry_net helper at the top.
     - |
       set -e
-      composer_net() {
-        for attempt in 1 2 3; do
-          if "$@"; then
-            return 0
-          fi
-          echo "composer attempt $attempt failed; retrying in $((attempt * 15))s..."
-          sleep $((attempt * 15))
-        done
-        echo "composer still failing after 3 attempts."
-        return 1
-      }
-      composer_net composer create-project "drupal/recommended-project:~$DRUPAL_CORE" /drupal --no-interaction --no-install
+      retry_net composer create-project "drupal/recommended-project:~$DRUPAL_CORE" /drupal --no-interaction --no-install
       cd /drupal
       composer config --no-plugins allow-plugins true
       composer config minimum-stability dev
       composer config prefer-stable true
-      composer_net composer require --no-interaction --no-progress --ignore-platform-reqs -W drush/drush drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop
-      composer_net composer install --no-interaction --no-progress --ignore-platform-reqs
+      retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W drush/drush drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs
+      retry_net composer install --no-interaction --no-progress --ignore-platform-reqs
     - cd /drupal
     - mkdir -p web/modules/custom && cp -r "$CI_PROJECT_DIR" web/modules/custom/drimage_improved
     # Install the base site from core's `standard` profile.
@@ -341,8 +360,8 @@ phpunit:
       fi
     # Browser toolchain, run from the copied module (its cucumber.js + steps).
     - cd web/modules/custom/drimage_improved
-    - npm install --no-audit --no-fund
-    - npx playwright install --with-deps chromium
+    - retry_net npm install --no-audit --no-fund
+    - retry_net npx playwright install --with-deps chromium
   script:
     - cd /drupal/web/modules/custom/drimage_improved
     - LAUNCH_URL="$LAUNCH_URL" FEATURES="$FEATURES" CUCUMBER_JSON="cucumber_report_$SETUP" npx cucumber-js --config cucumber.js --tags "$TAGS"
@@ -401,11 +420,12 @@ create-reports:
       artifacts: true
       optional: true
   before_script:
+    - *retry_net
     # The PDF is rendered by Playwright's Chromium (see generatePdf() in
     # @vardot/varbase-e2e/bin/generate-reports.js), so this job needs the browser
     # and its system libraries, not just the npm package.
-    - npm install --no-audit --no-fund
-    - npx playwright install --with-deps chromium
+    - retry_net npm install --no-audit --no-fund
+    - retry_net npx playwright install --with-deps chromium
   script:
     - mkdir -p tests/reports
     - 'echo "PHPUnit JUnit: $(test -f tests/reports/phpunit.junit.xml && echo present || echo missing)"'

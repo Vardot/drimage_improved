@@ -7,5 +7,8 @@
   "support": {
     "issues": "https://www.drupal.org/project/issues/drimage_improved",
     "source": "https://git.drupalcode.org/project/drimage_improved"
+  },
+  "require-dev": {
+    "drupal/s3fs": "^3.11"
   }
 }

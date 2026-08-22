@@ -6,8 +6,9 @@ use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\drimage_improved\Plugin\Field\FieldFormatter\DrImageFormatter;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Database\Connection;
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\FieldDefinitionInterface;
+use Drupal\image\ImageDerivativeUtilities;
 use Drupal\Core\File\FileUrlGeneratorInterface;
 use Drupal\Core\Session\AccountInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -77,10 +78,12 @@ class DrimageS3fsFormatter extends DrImageFormatter implements ContainerFactoryP
    *   Any third party settings.
    * @param \Drupal\Core\Session\AccountInterface $current_user
    *   The current user.
-   * @param \Drupal\Core\Entity\EntityStorageInterface $image_style_storage
-   *   The image style storage.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\Core\File\FileUrlGeneratorInterface $file_url_generator
    *   The file URL generator.
+   * @param \Drupal\image\ImageDerivativeUtilities|null $image_derivative_utilities
+   *   The image derivative utilities.
    * @param \Drupal\Core\Database\Connection $database
    *   The database connection.
    * @param \Drupal\s3fs\S3fsServiceInterface $s3fs
@@ -99,14 +102,15 @@ class DrimageS3fsFormatter extends DrImageFormatter implements ContainerFactoryP
     $view_mode,
     array $third_party_settings,
     AccountInterface $current_user,
-    EntityStorageInterface $image_style_storage,
+    EntityTypeManagerInterface $entity_type_manager,
     FileUrlGeneratorInterface $file_url_generator,
+    ?ImageDerivativeUtilities $image_derivative_utilities,
     Connection $database,
     S3fsServiceInterface $s3fs,
     ConfigFactoryInterface $configFactory,
     LoggerInterface $logger,
   ) {
-    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $current_user, $image_style_storage, $file_url_generator);
+    parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $current_user, $entity_type_manager->getStorage('image_style'), $file_url_generator, $image_derivative_utilities);
     $this->database = $database;
     $this->s3fs = $s3fs;
     $this->configFactory = $configFactory;
@@ -126,8 +130,9 @@ class DrimageS3fsFormatter extends DrImageFormatter implements ContainerFactoryP
       $configuration['view_mode'],
       $configuration['third_party_settings'],
       $container->get('current_user'),
-      $container->get('entity_type.manager')->getStorage('image_style'),
+      $container->get('entity_type.manager'),
       $container->get('file_url_generator'),
+      $container->get(ImageDerivativeUtilities::class),
       $container->get('database'),
       $container->get('s3fs'),
       $container->get('config.factory'),

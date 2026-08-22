@@ -33,7 +33,9 @@ real browser (Playwright + Cucumber-js; the shared step definitions come from th
 - **image_widget_crop (IWC) crop-type derivatives** are not covered here: the base site this
   suite runs on ships `focal_point` but not `image_widget_crop`. Add an IWC scenario on a base
   that enables it.
-- **s3fs** derivative path (`drimage_s3fs`) is out of scope (no S3 backend in the test base).
+- **s3fs** (`drimage_s3fs`): no browser scenarios (no S3 backend on the runner); its subscriber,
+  formatter and theme hook are covered by Kernel tests in `modules/drimage_s3fs/tests/src/Kernel`,
+  with `drupal/s3fs` as a `require-dev` dependency.
 
 ## Run
 

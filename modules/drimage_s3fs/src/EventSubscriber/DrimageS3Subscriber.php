@@ -13,6 +13,7 @@ use Drupal\drimage_improved\DrimageManagerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Drupal\Core\Cache\Cache;
 
@@ -146,7 +147,8 @@ final class DrimageS3Subscriber implements EventSubscriberInterface {
         $this->loggerFactory->error('Image not found: @uri', ['@uri' => $scheme . '://' . urldecode($file_name)]);
 
         // Throw a 404 error.
-        return new Response('Error generating image, missing source file.', 404);
+        $event->setResponse(new Response('Error generating image, missing source file.', 404));
+        return;
       }
 
       // Get the first (and presumably only) image entity.
@@ -158,11 +160,18 @@ final class DrimageS3Subscriber implements EventSubscriberInterface {
         $this->loggerFactory->error('Invalid file ID for image: @uri', ['@uri' => $scheme . '://' . urldecode($file_name)]);
 
         // Throw a 404 error.
-        return new Response('Error generating image, missing source file.', 404);
+        $event->setResponse(new Response('Error generating image, missing source file.', 404));
+        return;
       }
 
       // Deliver the image.
-      $this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) end($image)->id(), $iwc_id, $format);
+      try {
+        $event->setResponse($this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) $images->id(), $iwc_id, $format));
+      }
+      catch (NotFoundHttpException $exception) {
+        $event->setResponse(new Response($exception->getMessage(), 404));
+        return;
+      }
 
       // Add a cache tag based on the file ID to allow for targeted cache invalidation.
       $tags[] = 'file:' . $images->id();
