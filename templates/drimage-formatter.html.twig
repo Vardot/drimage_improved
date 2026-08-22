@@ -33,7 +33,8 @@
   {% endif %}
 
   {% if core_webp or imageapi_optimize_webp %}
-    <source data-format="webp" srcset="{{ dummy_image }}" type="image/webp">
+    {# No placeholder srcset: a data URI breaks srcset parsing. The script sets it. #}
+    <source data-format="webp" type="image/webp">
   {% endif %}
     <img src="{{ dummy_image }}" width="{{ width }}" height="{{ height }}" alt="{{ alt }}"{% if title %}title="{{ title }}"{% endif %} class="drimage-image" />
 

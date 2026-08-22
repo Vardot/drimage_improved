@@ -144,4 +144,20 @@ class DrimageFormatterTest extends KernelTestBase {
     $this->assertCount(0, $items);
   }
 
+  /**
+   * The rendered markup keeps the placeholder out of the WebP source srcset.
+   *
+   * A data URI in srcset makes the browser split on its comma and read the
+   * remainder as a descriptor: "Failed parsing 'srcset' attribute value since
+   * it has an unknown descriptor" (issue #3594133).
+   */
+  public function testWebpSourceHasNoPlaceholderSrcset(): void {
+    $build = $this->buildField([$this->image()]);
+    $html = (string) \Drupal::service('renderer')->renderRoot($build);
+
+    $this->assertStringContainsString('type="image/webp"', $html);
+    $this->assertStringNotContainsString('srcset="data:', $html);
+    $this->assertDoesNotMatchRegularExpression('/srcset="[^"]* [^"]*"/', $html, 'No srcset carries a raw space.');
+  }
+
 }
