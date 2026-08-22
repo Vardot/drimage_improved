@@ -99,7 +99,8 @@
     "DDEV",
     "weseze",
     "Jurgen",
-    "filemime"
+    "filemime",
+    "fetchpriority"
   ],
   "ignoreWords": [
     "dimentions"

@@ -218,6 +218,11 @@
         img.setAttribute('loading', data.lazyload);
       }
 
+      // Set fetchpriority attribute if defined and not 'auto'.
+      if (data.fetchpriority && data.fetchpriority !== 'auto') {
+        img.setAttribute('fetchpriority', data.fetchpriority);
+      }
+
       if (
         Number.isNaN(Number(data.fid)) === false &&
         data.fid % 1 === 0 &&

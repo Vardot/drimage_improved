@@ -160,4 +160,22 @@ class DrimageFormatterTest extends KernelTestBase {
     $this->assertDoesNotMatchRegularExpression('/srcset="[^"]* [^"]*"/', $html, 'No srcset carries a raw space.');
   }
 
+  /**
+   * A high fetch priority reaches the markup and the drimage data.
+   */
+  public function testFetchPriority(): void {
+    \Drupal::service('entity_display.repository')
+      ->getViewDisplay('entity_test', 'entity_test', 'default')
+      ->setComponent('field_drimage', [
+        'type' => 'drimage_improved',
+        'settings' => ['image_handling' => 'scale', 'fetchpriority' => 'high'],
+      ])
+      ->save();
+
+    $build = $this->buildField([$this->image()]);
+    $this->assertSame('high', $build[0]['#data']['fetchpriority']);
+    $html = (string) \Drupal::service('renderer')->renderRoot($build);
+    $this->assertStringContainsString('fetchpriority="high"', $html);
+  }
+
 }

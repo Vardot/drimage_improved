@@ -58,6 +58,7 @@ class DrImageFormatter extends ImageFormatter {
       'iwc' => [
         'image_style' => NULL,
       ],
+      'fetchpriority' => 'auto',
     ] + parent::defaultSettings();
   }
 
@@ -202,6 +203,18 @@ class DrImageFormatter extends ImageFormatter {
       ];
     }
 
+    $element['fetchpriority'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Fetch priority'),
+      '#description' => $this->t('The fetchpriority attribute provides a hint to the browser about the priority of fetching the image relative to other images.'),
+      '#options' => [
+        'auto' => $this->t('Auto (default)'),
+        'high' => $this->t('High'),
+        'low' => $this->t('Low'),
+      ],
+      '#default_value' => $this->getSetting('fetchpriority'),
+    ];
+
     return $element;
   }
 
@@ -228,6 +241,11 @@ class DrImageFormatter extends ImageFormatter {
     }
 
     $summary[] = $this->t('Image handling: @image_handling', $args);
+
+    $fetchpriority = $this->getSetting('fetchpriority');
+    if ($fetchpriority !== 'auto') {
+      $summary[] = $this->t('Fetch priority: @fetchpriority', ['@fetchpriority' => $fetchpriority]);
+    }
 
     return $summary;
   }
@@ -269,6 +287,7 @@ class DrImageFormatter extends ImageFormatter {
         'lazy_offset' => $config->get('lazy_offset'),
         'subdir' => $url,
         'lazyload' => $image_loading,
+        'fetchpriority' => $this->getSetting('fetchpriority'),
       ];
 
       [$scheme, $uri] = explode(':', $files[$delta]->getFileUri());
@@ -284,6 +303,7 @@ class DrImageFormatter extends ImageFormatter {
       $elements[$delta]['#placeholder_color'] = $config->get('placeholder_color');
       $elements[$delta]['#placeholder_image'] = $config->get('placeholder_image');
       $elements[$delta]['#placeholder_image_switch'] = $config->get('placeholder_image_switch');
+      $elements[$delta]['#fetchpriority'] = $this->getSetting('fetchpriority');
       $elements[$delta]['#data']['original_width'] = $element['#item']->getValue()['width'];
       $elements[$delta]['#data']['original_height'] = $element['#item']->getValue()['height'];
       $elements[$delta]['#data']['original_source'] = $uri;

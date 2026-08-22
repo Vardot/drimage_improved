@@ -56,6 +56,9 @@ field.formatter.settings.drimage_improved:
     image_handling:
       type: string
       label: 'Image handling'
+    fetchpriority:
+      type: string
+      label: 'Fetch priority'
     aspect_ratio:
       type: mapping
       label: 'Aspect ratio'

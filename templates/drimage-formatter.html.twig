@@ -36,7 +36,7 @@
     {# No placeholder srcset: a data URI breaks srcset parsing. The script sets it. #}
     <source data-format="webp" type="image/webp">
   {% endif %}
-    <img src="{{ dummy_image }}" width="{{ width }}" height="{{ height }}" alt="{{ alt }}"{% if title %}title="{{ title }}"{% endif %} class="drimage-image" />
+    <img src="{{ dummy_image }}" width="{{ width }}" height="{{ height }}" alt="{{ alt }}"{% if title %}title="{{ title }}"{% endif %}{% if fetchpriority and fetchpriority != 'auto' %} fetchpriority="{{ fetchpriority }}"{% endif %} class="drimage-image" />
 
   {% if url %}
   </picture></a>
@@ -45,6 +45,6 @@
   {% endif %}
 
   <noscript>
-    <img src="/{{ data.subdir }}/{{ data.original_source }}" alt="{{ alt }}"{% if title %} title="{{ title }}"{% endif %} width="{{ data.original_width }}" height="{{ data.original_height }}" loading="lazy">
+    <img src="/{{ data.subdir }}/{{ data.original_source }}" alt="{{ alt }}"{% if title %} title="{{ title }}"{% endif %} width="{{ data.original_width }}" height="{{ data.original_height }}" loading="lazy"{% if fetchpriority and fetchpriority != 'auto' %} fetchpriority="{{ fetchpriority }}"{% endif %}>
   </noscript>
 </div>

@@ -5,6 +5,8 @@
 #   build     - composer-validate
 #   validate  - phpcs, phpstan, cspell, eslint, stylelint  (gating)
 #   unit      - phpunit (Kernel)
+#   lighthouse- a dedicated Lighthouse audit with performance and accessibility
+#               budgets, straight after the unit tests
 #   test      - functional-acceptance: one browser job per setup
 #               (base, focal_point, image_widget_crop, webp_off), each applying
 #               its own testing recipe. 4 jobs.
@@ -24,7 +26,7 @@
 # starter recipe itself (Canvas component "active_version hash mismatch" / "would
 # delete in-use Canvas component"), which is distribution drift, not this module.
 ################################################################################
-stages: [build, validate, unit, test, report]
+stages: [build, validate, unit, lighthouse, test, report]
 
 variables:
   # Drupal 11.4 is the current supported minor; the module declares
@@ -401,6 +403,47 @@ functional-acceptance:
         RECIPE: drimage_improved_test_webp_off
         TAGS: "not @focal and not @iwc and not @webp-on"
 
+# Lighthouse audit of the served test site: the module's whole point is fast
+# images, so performance and accessibility get a budget in CI next to the tests.
+lighthouse:
+  extends: .acceptance
+  stage: lighthouse
+  variables:
+    SETUP: lighthouse
+    RECIPE: drimage_improved_test_focal_point
+    MIN_PERFORMANCE: "0.80"
+    MIN_ACCESSIBILITY: "0.90"
+  script:
+    - cd /drupal/web/modules/custom/drimage_improved
+    - npm install --no-audit --no-fund --no-save lighthouse@12
+    - mkdir -p "$CI_PROJECT_DIR/tests/reports"
+    - |
+      CHROME_PATH="$(node -e 'console.log(require("playwright").chromium.executablePath())')" \
+      npx lighthouse "$LAUNCH_URL" \
+        --only-categories=performance,accessibility,best-practices,seo \
+        --output=json --output=html \
+        --output-path="$CI_PROJECT_DIR/tests/reports/lighthouse" \
+        --chrome-flags="--headless=new --no-sandbox --disable-dev-shm-usage" \
+        --quiet
+    - |
+      node -e '
+        const fs=require("fs");
+        const r=JSON.parse(fs.readFileSync(process.env.CI_PROJECT_DIR+"/tests/reports/lighthouse.report.json","utf8"));
+        const s=Object.fromEntries(Object.entries(r.categories).map(([k,v])=>[k,v.score]));
+        console.log("scores:",JSON.stringify(s));
+        const min={performance:+process.env.MIN_PERFORMANCE,accessibility:+process.env.MIN_ACCESSIBILITY};
+        const bad=Object.entries(min).filter(([k,v])=>!(s[k]>=v));
+        if(bad.length){console.error("below budget: "+bad.map(([k,v])=>`${k} ${s[k]} < ${v}`).join(", "));process.exit(1)}
+        console.log("all budgets met");
+      '
+  after_script:
+    - cp -f /tmp/php-server.log "$CI_PROJECT_DIR/tests/reports/php-server-lighthouse.log" 2>/dev/null || true
+  artifacts:
+    when: always
+    paths:
+      - tests/reports/
+  allow_failure: false
+
 # ---------------------------------------------------------------------------
 # report
 # ---------------------------------------------------------------------------
@@ -417,6 +460,9 @@ create-reports:
       artifacts: true
       optional: true
     - job: functional-acceptance
+      artifacts: true
+      optional: true
+    - job: lighthouse
       artifacts: true
       optional: true
   before_script:

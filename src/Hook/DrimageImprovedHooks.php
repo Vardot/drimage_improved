@@ -51,6 +51,7 @@ class DrimageImprovedHooks {
           'placeholder_color' => NULL,
           'placeholder_image' => NULL,
           'placeholder_image_switch' => NULL,
+          'fetchpriority' => NULL,
         ],
       ],
     ];
