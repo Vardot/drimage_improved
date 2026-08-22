@@ -1,0 +1,24 @@
+_meta:
+  version: '1.0'
+  entity_type: file
+  uuid: 24df339c-ea98-546c-bf95-295d0b855c57
+  default_langcode: en
+default:
+  uid:
+    -
+      target_id: 1
+  filename:
+    -
+      value: drimage-sample.png
+  uri:
+    -
+      value: 'public://drimage-test/drimage-sample.png'
+  filemime:
+    -
+      value: image/png
+  filesize:
+    -
+      value: 168110
+  status:
+    -
+      value: true

@@ -1,0 +1,43 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.drimage_test.field_drimage_image
+    - node.type.drimage_test
+  module:
+    - drimage_improved
+    - user
+id: node.drimage_test.default
+targetEntityType: node
+bundle: drimage_test
+mode: default
+content:
+  field_drimage_image:
+    type: drimage_improved
+    label: hidden
+    settings:
+      image_handling: scale
+      aspect_ratio:
+        width: 1
+        height: 1
+      background:
+        attachment: scroll
+        position: 'center center'
+        size: cover
+      iwc:
+        image_style: null
+      image_style: ''
+      image_link: ''
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  langcode: true
+  search_api_excerpt: true

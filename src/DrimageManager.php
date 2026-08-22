@@ -8,13 +8,12 @@ use Drupal\Core\Entity\EntityStorageException;
 use Drupal\file\Entity\File;
 use Drupal\image\Controller\ImageStyleDownloadController;
 use Drupal\image\Entity\ImageStyle;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * @todo Add class description.
+ * Resolves, creates and delivers the on-the-fly Drimage image styles.
  */
 final class DrimageManager extends ImageStyleDownloadController implements DrimageManagerInterface {
 
@@ -59,7 +58,8 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
    * @param string|null $iwc_id
    *   Optional image_widget_crop crop type to use.
    *
-   * @return string The id drimage_improved should use for image_styles.
+   * @return string
+   *   The id drimage_improved should use for image_styles.
    */
   protected function getDrimageId($requested_dimensions, $iwc_id) {
     if ($iwc_id) {
@@ -85,7 +85,8 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
    * @param string|null $iwc_id
    *   Optional image_widget_crop crop type to use.
    *
-   * @return string The label drimage_improved should use for image_styles.
+   * @return string
+   *   The label drimage_improved should use for image_styles.
    */
   protected function getDrimageLabel($requested_dimensions, $iwc_id) {
     if ($iwc_id) {
@@ -356,7 +357,7 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
       if (!$this->moduleHandler()->moduleExists('image_widget_crop')) {
         $error_msg = 'Image_widget_crop module is not active.';
       }
-      elseif (!$crop_type = \Drupal::entityTypeManager()->getStorage('crop_type')->load($iwc_id)) {
+      elseif (!\Drupal::entityTypeManager()->getStorage('crop_type')->load($iwc_id)) {
         $error_msg = 'Image_widget_crop type not found.';
       }
     }

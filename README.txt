@@ -60,7 +60,7 @@ CONFIGURATION
    select "Dynamic Responsive Image" as the Image formatter. You can optionally
    choose a fallback image style and link the image.
 
- * If you want to limit the amount of image styles drimage_improved ceates (to save on
+ * If you want to limit the amount of image styles drimage_improved creates (to save on
    diskspace) you can set a threshold pixel value for 2 image styles to
    minimally differ at /admin/config/media/drimage_improved. Resulting images will be
    up-/downscaled in the browser.

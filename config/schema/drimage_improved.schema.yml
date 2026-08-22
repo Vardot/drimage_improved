@@ -19,7 +19,7 @@ drimage_improved.settings:
       label: 'Enable device pixel ratio detection'
     lazy_offset:
       type: integer
-      label: 'Lazyloader offeset'
+      label: 'Lazyloader offset'
     core_webp:
       type: boolean
       label: 'Support for webp through Core'
@@ -47,3 +47,43 @@ drimage_improved.settings:
     legacy_lazyload:
       type: boolean
       label: 'Use drimage_improved JS lazyloader'
+
+# Field formatter settings for the Drimage responsive image formatter.
+field.formatter.settings.drimage_improved:
+  type: field.formatter.settings.image
+  label: 'Drimage formatter settings'
+  mapping:
+    image_handling:
+      type: string
+      label: 'Image handling'
+    aspect_ratio:
+      type: mapping
+      label: 'Aspect ratio'
+      mapping:
+        width:
+          type: integer
+          label: 'Width'
+        height:
+          type: integer
+          label: 'Height'
+    background:
+      type: mapping
+      label: 'Background'
+      mapping:
+        attachment:
+          type: string
+          label: 'Attachment'
+        position:
+          type: string
+          label: 'Position'
+        size:
+          type: string
+          label: 'Size'
+    iwc:
+      type: mapping
+      label: 'Image widget crop'
+      mapping:
+        image_style:
+          type: string
+          label: 'Image style'
+          nullable: true

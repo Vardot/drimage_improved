@@ -1,0 +1,7 @@
+name: 'Drimage Improved (testing only) - image_widget_crop'
+description: 'Hidden, testing-only recipe. Applies the base Drimage test setup, enables Image Widget Crop and provides a "square" crop type, so the crop-type derivative path is exercised. Not intended for production sites.'
+type: 'Testing'
+recipes:
+  - drimage_improved_test
+install:
+  - image_widget_crop

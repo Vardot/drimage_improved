@@ -1,0 +1,35 @@
+_meta:
+  version: '1.0'
+  entity_type: node
+  uuid: a833e966-4332-5368-95c2-98e859a91cf2
+  bundle: drimage_test
+  default_langcode: en
+  depends:
+    24df339c-ea98-546c-bf95-295d0b855c57: file
+default:
+  uid:
+    -
+      target_id: 1
+  status:
+    -
+      value: true
+  title:
+    -
+      value: 'Drimage test page'
+  promote:
+    -
+      value: true
+  sticky:
+    -
+      value: false
+  path:
+    -
+      alias: /drimage-test-page
+      langcode: en
+  field_drimage_image:
+    -
+      entity: 24df339c-ea98-546c-bf95-295d0b855c57
+      alt: 'Drimage sample image'
+      title: ''
+      width: 800
+      height: 600

@@ -1,0 +1,10 @@
+name: 'Drimage Improved (testing only) - WebP off'
+description: 'Hidden, testing-only recipe. Applies the base Drimage test setup with core WebP support disabled, so the no-WebP rendering path is exercised. Not intended for production sites.'
+type: 'Testing'
+recipes:
+  - drimage_improved_test
+config:
+  actions:
+    drimage_improved.settings:
+      simpleConfigUpdate:
+        core_webp: false

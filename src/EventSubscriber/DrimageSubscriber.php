@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
- * Sunscribes to kernel request event so it handles non-exixting images.
+ * Subscribes to kernel request event so it handles non-existing images.
  */
 final class DrimageSubscriber implements EventSubscriberInterface {
 
@@ -77,7 +77,7 @@ final class DrimageSubscriber implements EventSubscriberInterface {
    * @param \Drupal\Core\Logger\LoggerChannelFactory $logger_factory
    *   The logger factory.
    * @param \Drupal\drimage_improved\DrimageManagerInterface $drimage_manager
-   *  The Drimage manager.
+   *   The Drimage manager.
    */
   public function __construct(StreamWrapperManagerInterface $stream_wrapper_manager, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory, LoggerChannelFactoryInterface $logger_factory, DrimageManagerInterface $drimage_manager) {
     $this->streamWrapperManager = $stream_wrapper_manager;

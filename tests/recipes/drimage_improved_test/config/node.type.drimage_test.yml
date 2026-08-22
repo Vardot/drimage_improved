@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies: {}
+name: Drimage Test
+type: drimage_test
+description: 'Testing-only content type that renders an image field through the Drimage formatter.'
+help: 'Used by the automated Drimage tests only.'
+new_revision: true
+preview_mode: 0
+display_submitted: true

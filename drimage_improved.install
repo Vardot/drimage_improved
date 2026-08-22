@@ -36,4 +36,3 @@ function drimage_improved_uninstall(): void {
   \Drupal::service('drimage_improved.image_style_repository')
     ->deleteAll();
 }
-

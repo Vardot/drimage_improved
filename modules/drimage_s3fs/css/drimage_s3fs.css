@@ -1,10 +1,10 @@
 .s3_drimage {
   height: inherit;
-  line-height: 0;
-  font-size: 0;
-  padding: 0;
   margin: 0;
+  padding: 0;
   border: 0;
+  font-size: 0;
+  line-height: 0;
 }
 
 .s3_drimage img {
@@ -22,10 +22,10 @@
 .s3_drimage.is-background-image > picture > img,
 .s3_drimage.is-background-image > a > picture,
 .s3_drimage.is-background-image > a > picture > img {
-  clip: rect(1px, 1px, 1px, 1px);
   overflow: hidden;
-  height: 1px;
+  clip: rect(1px, 1px, 1px, 1px);
   width: 1px;
-  word-wrap: normal;
+  height: 1px;
   margin-top: -1px;
+  word-wrap: normal;
 }

@@ -82,8 +82,10 @@ function drimage_improved_modules_uninstalled(array $modules, bool $isSyncing): 
     return;
   }
 
+  // When drimage_improved is (un)installed in the same batch as one of these
+  // modules the container may not carry its services yet, so guard the call.
   $modulesToCheck = ['image_widget_crop', 'automated_crop', 'focal_point'];
-  if (array_intersect($modulesToCheck, $modules)) {
+  if (array_intersect($modulesToCheck, $modules) && \Drupal::hasService('drimage_improved.image_style_repository')) {
     \Drupal::service('drimage_improved.image_style_repository')
       ->deleteAll();
   }
@@ -98,8 +100,11 @@ function drimage_improved_modules_installed(array $modules, bool $isSyncing): vo
     return;
   }
 
+  // Installing drimage_improved together with one of these modules (for
+  // example from a recipe) fires this hook before the container carries the
+  // drimage_improved services, so guard the call.
   $modulesToCheck = ['image_widget_crop', 'automated_crop', 'focal_point'];
-  if (array_intersect($modulesToCheck, $modules)) {
+  if (array_intersect($modulesToCheck, $modules) && \Drupal::hasService('drimage_improved.image_style_repository')) {
     \Drupal::service('drimage_improved.image_style_repository')
       ->deleteAll();
   }

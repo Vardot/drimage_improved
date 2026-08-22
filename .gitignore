@@ -1,0 +1,19 @@
+# Node / front-end acceptance toolchain.
+/node_modules/
+/package-lock.json
+/yarn.lock
+
+# Functional test (Playwright / Cucumber-js) run artifacts.
+/tests/reports/
+/tests/screenshots/
+/tests/videos/
+
+# gitlab-ci-local working directory.
+/.gitlab-ci-local/
+
+# Core configs copied in by the eslint/stylelint jobs at runtime.
+/.eslintrc.json
+/.eslintrc.passing.json
+/.stylelintrc.json
+/.prettierrc.json
+/core-package.json

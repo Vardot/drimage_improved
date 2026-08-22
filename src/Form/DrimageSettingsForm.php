@@ -15,9 +15,7 @@ use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class DrimageSettingsForm.
- *
- * @package Drupal\drimage_improved\Form
+ * Configures the Drimage image style generation settings.
  */
 class DrimageSettingsForm extends ConfigFormBase {
 
@@ -47,6 +45,8 @@ class DrimageSettingsForm extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Config\TypedConfigManagerInterface $typedConfigManager
+   *   The typed config manager.
    * @param \Drupal\Core\Datetime\DateFormatterInterface $date_formatter
    *   The date formatter service.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
@@ -228,7 +228,7 @@ class DrimageSettingsForm extends ConfigFormBase {
 
     $form['lazy_offset'] = [
       '#type' => 'number',
-      '#title' => $this->t('Lazyloader offeset'),
+      '#title' => $this->t('Lazyloader offset'),
       '#default_value' => $this->config('drimage_improved.settings')->get('lazy_offset'),
       '#description' => $this->t("Images are always lazy loaded once they are in the browser's canvas. This offset value loads them x amount of pixels before they are visible."),
       '#min' => 0,
@@ -320,11 +320,11 @@ class DrimageSettingsForm extends ConfigFormBase {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
 
-      // Validate HEX color code or transparent
-      if (!preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/', $form_state->getValue('placeholder_color'))) {
-        $form_state->setErrorByName('placeholder_color', $this->t('The placeholder color must be a valid HEX color code (e.g., #ffffff).'));
-        return;
-      }
+    // Validate HEX color code or transparent.
+    if (!preg_match('/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{8})$/', $form_state->getValue('placeholder_color'))) {
+      $form_state->setErrorByName('placeholder_color', $this->t('The placeholder color must be a valid HEX color code (e.g., #ffffff).'));
+      return;
+    }
   }
 
   /**

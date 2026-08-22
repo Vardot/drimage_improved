@@ -86,7 +86,7 @@ class DrImageFormatter extends ImageFormatter {
       ],
       'container_size' => [
         '#description' => $this->t("The image will be scaled and cropped to an exact size of drimage container."),
-      ]
+      ],
     ];
 
     $element['aspect_ratio'] = [
@@ -279,8 +279,8 @@ class DrImageFormatter extends ImageFormatter {
       $elements[$delta]['#height'] = $element['#item']->getValue()['height'];
       $elements[$delta]['#core_webp'] = $config->get('core_webp');
       $elements[$delta]['#imageapi_optimize_webp'] = $config->get('imageapi_optimize_webp');
-      $elements[$delta]['#alt'] = $element['#item']->getValue()['alt'];
-      $elements[$delta]['#title'] = $element['#item']->getValue()['title'];
+      $elements[$delta]['#alt'] = $element['#item']->getValue()['alt'] ?? NULL;
+      $elements[$delta]['#title'] = $element['#item']->getValue()['title'] ?? NULL;
       $elements[$delta]['#placeholder_color'] = $config->get('placeholder_color');
       $elements[$delta]['#placeholder_image'] = $config->get('placeholder_image');
       $elements[$delta]['#placeholder_image_switch'] = $config->get('placeholder_image_switch');

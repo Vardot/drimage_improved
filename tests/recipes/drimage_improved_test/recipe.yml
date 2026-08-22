@@ -1,0 +1,14 @@
+name: 'Drimage Improved (testing only)'
+description: 'Hidden, testing-only recipe. Base setup. Provisions a "Drimage Test" content type with a multi-value image field rendered through the Drimage formatter, a sample "Drimage test page" node with an image, and sets that page as the front page, so automated functional tests have a deterministic Drimage page to drive. Not intended for production sites.'
+type: 'Testing'
+install:
+  - node
+  - field
+  - image
+  - path
+  - drimage_improved
+config:
+  actions:
+    system.site:
+      simpleConfigUpdate:
+        page.front: /drimage-test-page

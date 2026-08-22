@@ -1,0 +1,7 @@
+name: 'Drimage Improved (testing only) - focal_point'
+description: 'Hidden, testing-only recipe. Applies the base Drimage test setup and enables Focal Point, so the focal-point derivative path is exercised. Not intended for production sites.'
+type: 'Testing'
+recipes:
+  - drimage_improved_test
+install:
+  - focal_point

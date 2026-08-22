@@ -87,30 +87,31 @@ class DrimageS3fsFormatter extends DrImageFormatter implements ContainerFactoryP
    *   S3fs Service.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
    *   Config Factory service.
-   *  @param \Psr\Log\LoggerInterface $logger
+   * @param \Psr\Log\LoggerInterface $logger
    *   Logger service.
    */
   public function __construct(
-    $plugin_id, 
-    $plugin_definition, 
-    FieldDefinitionInterface $field_definition, 
-    array $settings, $label, $view_mode, 
-    array $third_party_settings, 
-    AccountInterface $current_user, 
-    EntityStorageInterface $image_style_storage, 
-    FileUrlGeneratorInterface $file_url_generator, 
-    Connection $database, 
-    S3fsServiceInterface $s3fs, 
-    ConfigFactoryInterface $configFactory, 
-    LoggerInterface $logger
-    ) {
+    $plugin_id,
+    $plugin_definition,
+    FieldDefinitionInterface $field_definition,
+    array $settings,
+    $label,
+    $view_mode,
+    array $third_party_settings,
+    AccountInterface $current_user,
+    EntityStorageInterface $image_style_storage,
+    FileUrlGeneratorInterface $file_url_generator,
+    Connection $database,
+    S3fsServiceInterface $s3fs,
+    ConfigFactoryInterface $configFactory,
+    LoggerInterface $logger,
+  ) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $label, $view_mode, $third_party_settings, $current_user, $image_style_storage, $file_url_generator);
     $this->database = $database;
     $this->s3fs = $s3fs;
     $this->configFactory = $configFactory;
     $this->logger = $logger;
   }
-
 
   /**
    * {@inheritdoc}
