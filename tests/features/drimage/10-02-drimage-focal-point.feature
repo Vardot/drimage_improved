@@ -8,4 +8,4 @@ Feature: Drimage - Focal point derivatives - Image generation
   Scenario: Check that a focal-point Drimage image loads its generated derivative on the homepage
     Given I am an anonymous user
      When I go to homepage
-     Then the image "[data-drimage_improved] picture img" should be loaded within 2 seconds
+     Then the drimage images should be loaded

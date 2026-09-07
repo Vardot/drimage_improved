@@ -9,7 +9,7 @@ Feature: Drimage - Performance - Page and derivative budgets
     Given I am an anonymous user
      When I go to homepage
      Then the page should load in less than 3 seconds
-      And the image "[data-drimage_improved] picture img" should be loaded within 2 seconds
+      And the drimage images should be loaded
 
   @check @local @development @staging @production
   Scenario: Check that a generated derivative responds within its budget once warm

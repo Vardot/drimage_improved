@@ -22,11 +22,40 @@ real browser (Playwright + Cucumber-js; the shared step definitions come from th
   (naturalWidth stays 0) — the regression guard for the focal off-by-one fixed in
   drimage_improved 1.0.11 (issue #3618235).
 
-## Custom step
+## Steps
 
-- `Then the image "<selector>" should be loaded [within N seconds]` — passes only when the
-  matched `<img>` reports `complete` and `naturalWidth > 0`, i.e. the derivative decoded.
-  (`tests/step-definitions/drimage.steps.js`.)
+Every Drimage assertion this suite uses ships in the step library, in the Drimage Improved
+step pack (`@vardot/varbase-e2e` 2.0.4 or later,
+`node_modules/@vardot/varbase-e2e/docs/steps/drupal-drimage-improved.md`). The steps carry no
+CSS selectors: the pack knows the formatter markup and the derivative path, so a scenario says
+what a visitor sees.
+
+All the images on the page:
+
+- `Then the drimage images should be rendered [within N seconds]`
+- `Then the drimage images should be loaded [within N seconds]`
+- `Then the drimage images should offer webp [within N seconds]`
+- `Then the drimage images should have a noscript fallback [within N seconds]`
+- `Then the drimage images should use lazy loading [within N seconds]`
+- `Then the drimage images should be sized for the viewport [within N seconds]`
+- `Then no drimage image should be broken [within N seconds]`
+
+One image, named the way a person points at a picture — by alt text, title, caption, order in
+the page or number, never by a selector:
+
+- `Then the drimage image "<alt text or title>" should be loaded [within N seconds]`
+- `Then the drimage image titled "<title>" should be loaded`
+- `Then the drimage image captioned "<caption>" should be loaded`
+- `Then the drimage image with the alt text "<alt>" should be loaded`
+- `Then the first drimage image should be loaded` / `the 3rd` / `the last`
+- `Then the drimage image number 3 should be loaded`
+- `Then the <target> drimage image should still be a placeholder`
+- `Then the <target> drimage image should be in a figure`
+
+The regression guard for the focal off-by-one fixed in drimage_improved 1.0.11
+(issue #3618235) is `the drimage images should be loaded`: it passes only when an `<img>`
+reports `complete` with `naturalWidth > 0` on a derivative under `/styles/drimage_improved_*`,
+so it fails red when the derivative does not generate.
 
 ## Coverage gaps (honest)
 

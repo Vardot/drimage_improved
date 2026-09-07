@@ -21,7 +21,8 @@ module.exports = {
       // Shared step definitions from the step library (I am an anonymous user, I go to
       // homepage, "…" should be attached within N seconds, I should see, …).
       'node_modules/@vardot/varbase-e2e/tests/step-definitions/**/*.js',
-      // The Drimage custom step ("… should be loaded"), shipped in this module.
+      // This module's own step definitions. The Drimage assertions themselves now ship
+      // in the step library's Drimage Improved pack, so this path is for anything local.
       'tests/step-definitions/**/*.js',
     ],
     // FEATURES scopes the run; unset runs every Drimage feature.

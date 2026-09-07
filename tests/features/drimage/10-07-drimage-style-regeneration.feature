@@ -12,5 +12,5 @@ Feature: Drimage - Image styles - Regeneration after they are deleted
      Then I should see "Drimage Settings have been successfully saved."
     Given I am an anonymous user
      When I go to homepage
-     Then "[data-drimage_improved] picture img" should be attached within 2 seconds
-      And the image "[data-drimage_improved] picture img" should be loaded within 2 seconds
+     Then the drimage images should be rendered
+      And the drimage images should be loaded

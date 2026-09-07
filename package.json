@@ -11,6 +11,6 @@
     "test:chromium": "BROWSER=chromium node ./node_modules/@cucumber/cucumber/bin/cucumber.js --config cucumber.js"
   },
   "devDependencies": {
-    "@vardot/varbase-e2e": "^2"
+    "@vardot/varbase-e2e": "^2.0.4"
   }
 }
