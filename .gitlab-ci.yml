@@ -32,6 +32,10 @@ variables:
   # Drupal 11.4 is the current supported minor; the module declares
   # core_version_requirement ^9.3 || ^10 || ^11.
   DRUPAL_CORE: "11.4.0"
+  # Temporary (#3625833): Twig 3.30.0 compiles Drupal core's drupal_escape
+  # filter into a direct EscaperRuntime::escape() call, so every page render is
+  # a fatal TypeError. Every build requires this until a fixed Twig is out.
+  TWIG_CONSTRAINT: "twig/twig:<3.30"
   COMPOSER_ALLOW_SUPERUSER: "1"
   COMPOSER_MEMORY_LIMIT: "-1"
 
@@ -106,7 +110,7 @@ phpstan:
     - composer config minimum-stability dev
     # focal_point is a soft integration point for Drimage's derivatives; pull it
     # so phpstan-drupal can resolve the classes the module references.
-    - retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W mglaman/phpstan-drupal phpstan/extension-installer drush/drush drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs
+    - retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W mglaman/phpstan-drupal phpstan/extension-installer drush/drush drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs "$TWIG_CONSTRAINT"
     - retry_net composer install --no-interaction --no-progress --ignore-platform-reqs
     - mkdir -p web/modules/custom && cp -r "$CI_PROJECT_DIR" web/modules/custom/drimage_improved
   script:
@@ -189,7 +193,7 @@ phpunit:
     - cd /drupal
     - composer config --no-plugins allow-plugins true
     - composer config minimum-stability dev
-    - retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W "drupal/core-dev:~$DRUPAL_CORE" drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs
+    - retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W "drupal/core-dev:~$DRUPAL_CORE" drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs "$TWIG_CONSTRAINT"
     - retry_net composer install --no-interaction --no-progress --ignore-platform-reqs
     - mkdir -p web/modules/custom && cp -r "$CI_PROJECT_DIR" web/modules/custom/drimage_improved
   script:
@@ -261,7 +265,7 @@ phpunit:
       composer config --no-plugins allow-plugins true
       composer config minimum-stability dev
       composer config prefer-stable true
-      retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W drush/drush drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs
+      retry_net composer require --no-interaction --no-progress --ignore-platform-reqs -W drush/drush drupal/focal_point drupal/imageapi_optimize drupal/stage_file_proxy drupal/image_widget_crop drupal/s3fs "$TWIG_CONSTRAINT"
       retry_net composer install --no-interaction --no-progress --ignore-platform-reqs
     - cd /drupal
     - mkdir -p web/modules/custom && cp -r "$CI_PROJECT_DIR" web/modules/custom/drimage_improved
