@@ -1,4 +1,5 @@
 {
+  "packageManager": "yarn@4.9.3",
   "name": "drimage_improved",
   "description": "Front-end functional (BDD) acceptance tests for the Drimage module.",
   "private": true,

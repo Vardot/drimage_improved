@@ -1,7 +1,6 @@
 # Node / front-end acceptance toolchain.
 /node_modules/
 /package-lock.json
-/yarn.lock
 
 # Functional test (Playwright / Cucumber-js) run artifacts.
 /tests/reports/
