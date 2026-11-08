@@ -31,7 +31,7 @@ stages: [build, validate, unit, lighthouse, test, report]
 variables:
   # Drupal 11.4 is the current supported minor; the module declares
   # core_version_requirement ^9.3 || ^10 || ^11.
-  DRUPAL_CORE: "11.4.0"
+  DRUPAL_CORE: "11.4.11"
   # Temporary (#3625833): Twig 3.30.0 compiles Drupal core's drupal_escape
   # filter into a direct EscaperRuntime::escape() call, so every page render is
   # a fatal TypeError. Every build requires this until a fixed Twig is out.
@@ -120,7 +120,7 @@ phpstan:
 
 cspell:
   stage: validate
-  image: public.ecr.aws/docker/library/node:20
+  image: public.ecr.aws/docker/library/node:24
   before_script:
     - *retry_net
     - retry_net npm install -g cspell
@@ -133,7 +133,7 @@ cspell:
 # core tag). Gating; nothing masked.
 eslint:
   stage: validate
-  image: public.ecr.aws/docker/library/node:20
+  image: public.ecr.aws/docker/library/node:24
   before_script:
     - *retry_net
     - apt-get update -y > /dev/null && apt-get install -y -qq git > /dev/null
@@ -147,7 +147,7 @@ eslint:
 
 stylelint:
   stage: validate
-  image: public.ecr.aws/docker/library/node:20
+  image: public.ecr.aws/docker/library/node:24
   before_script:
     - *retry_net
     - apt-get update -y > /dev/null && apt-get install -y -qq git > /dev/null
@@ -253,7 +253,7 @@ phpunit:
     # browser picks the WebP source and shows a broken image.
     - docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp > /dev/null
     - docker-php-ext-install -j"$(nproc)" gd pdo_mysql zip > /dev/null
-    - curl -fsSL https://deb.nodesource.com/setup_20.x | bash - > /dev/null && apt-get install -y -qq nodejs > /dev/null
+    - curl -fsSL https://deb.nodesource.com/setup_24.x | bash - > /dev/null && apt-get install -y -qq nodejs > /dev/null
     - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
     # Build a plain Drupal site pinned to $DRUPAL_CORE. Composer fetches hundreds of
     # archives and regularly loses one to a transient network failure, especially with
@@ -457,7 +457,7 @@ lighthouse:
 # report. Runs even if a test job failed so the report always reflects reality.
 create-reports:
   stage: report
-  image: public.ecr.aws/docker/library/node:20
+  image: public.ecr.aws/docker/library/node:24
   when: always
   needs:
     - job: phpunit
