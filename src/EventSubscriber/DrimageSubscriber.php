@@ -178,7 +178,8 @@ final class DrimageSubscriber implements EventSubscriberInterface {
    */
   public static function getSubscribedEvents(): array {
     return [
-      KernelEvents::REQUEST => ['onKernelRequest'],
+      // Before the router (32): it 404s an image style that does not exist yet.
+      KernelEvents::REQUEST => ['onKernelRequest', 33],
     ];
   }
 
