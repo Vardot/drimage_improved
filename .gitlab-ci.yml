@@ -271,6 +271,10 @@ phpunit:
     - mkdir -p web/modules/custom && cp -r "$CI_PROJECT_DIR" web/modules/custom/drimage_improved
     # Install the base site from core's `standard` profile.
     - php -d memory_limit=512M vendor/drush/drush/drush.php site:install standard --db-url="mysql://root@mariadb/drupal" --account-name=webmaster --account-pass=dD.123123ddd --site-name="Drimage CI" -y
+    # The testing recipe enables the hidden test module under tests/modules
+    # (drimage_improved_lock_test), which Drupal only discovers with this setting.
+    - chmod u+w web/sites/default web/sites/default/settings.php
+    - echo "\$settings['extension_discovery_scan_tests'] = TRUE;" >> web/sites/default/settings.php
     # Core's `standard` profile does NOT install Media (see standard.info.yml): its
     # media.type.* files are OPTIONAL config, so a bare standard site has no
     # /media/add page at all. The editorial feature exercises Drimage against core

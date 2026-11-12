@@ -7,6 +7,7 @@ install:
   - image
   - path
   - drimage_improved
+  - drimage_improved_lock_test
 config:
   actions:
     system.site:

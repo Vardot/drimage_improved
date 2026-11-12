@@ -57,6 +57,35 @@ The regression guard for the focal off-by-one fixed in drimage_improved 1.0.11
 reports `complete` with `naturalWidth > 0` on a derivative under `/styles/drimage_improved_*`,
 so it fails red when the derivative does not generate.
 
+## Image generation in progress (issue #3637295)
+
+`10-09-drimage-generation-in-progress.feature` covers several visitors asking for the same new
+image size at once. Core answers "Image generation in progress" at once while another request
+holds its lock, and an image tag never retries. Drimage takes a lock of its own around
+generation, the way core uses its lock API: a second request waits for it
+(`LockBackendInterface::wait()`, up to 2 seconds) and delivers the image the first one made, and
+answers a plain 503 that is never cached only when generation takes longer than that.
+
+The race is made deterministic by the hidden testing module
+`tests/modules/drimage_improved_lock_test` (enabled by the `drimage_improved_test` recipe): it
+removes a derivative and writes Drimage's generation lock (`DrimageManager::generationLockName()`)
+into the `semaphore` table, so the lock outlives
+the request that took it and expires on its own, exactly like a slow generation in another PHP
+process. Its route needs `administer image styles`. Drupal discovers modules under `tests/` only with
+`$settings['extension_discovery_scan_tests'] = TRUE;` in `settings.php`, which the CI job sets.
+
+Its steps are local (`tests/step-definitions/drimage-generation-lock.steps.js`), because they
+must keep the FIRST response a visitor got; the library's status step re-requests the URL, and
+by then the derivative exists:
+
+- `Given another request is generating the drimage image "<uri>" for N seconds`
+- `Given the drimage image "<uri>" has not been generated yet`
+- `When a visitor requests that drimage image`
+- `When N visitors request that drimage image at the same time`
+- `Then every visitor should get the drimage image` / `Then the visitor should get the drimage image`
+- `Then the visitor should be asked to try the drimage image again shortly`
+- `Then the drimage image request should have waited at least N seconds`
+
 ## Coverage gaps (honest)
 
 - **image_widget_crop (IWC) crop-type derivatives** are not covered here: the base site this
@@ -80,7 +109,7 @@ npx cucumber-js --config cucumber.js tests/features/drimage/10-02-drimage-focal-
 
 | Recipe | Adds |
 |---|---|
-| `drimage_improved_test` | Base setup: a "Drimage Test" content type with a multi-value image field rendered through the Drimage formatter, a sample "Drimage test page" (image included) as default content, set as the front page. |
+| `drimage_improved_test` | Base setup: a "Drimage Test" content type with a multi-value image field rendered through the Drimage formatter, a sample "Drimage test page" (image included) as default content, set as the front page, and the hidden `drimage_improved_lock_test` module (needs `extension_discovery_scan_tests`). |
 | `drimage_improved_test_focal_point` | Base + Focal Point. |
 | `drimage_improved_test_image_widget_crop` | Base + Image Widget Crop with a `square` crop type. |
 | `drimage_improved_test_webp_off` | Base with core WebP support disabled. |

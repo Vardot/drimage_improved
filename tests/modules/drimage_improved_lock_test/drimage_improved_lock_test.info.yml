@@ -1,0 +1,8 @@
+name: 'Drimage Improved lock test'
+type: module
+description: 'Testing only. Simulates another request generating a Drimage derivative, so the functional tests can reproduce the "Image generation in progress" race. Never enable on a real site.'
+package: Testing
+hidden: true
+core_version_requirement: ^10 || ^11 || ^12
+dependencies:
+  - drimage_improved:drimage_improved

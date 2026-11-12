@@ -10,10 +10,10 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Drupal\Core\StreamWrapper\StreamWrapperManagerInterface;
 use Drupal\drimage_improved\DrimageManagerInterface;
+use Drupal\drimage_improved\EventSubscriber\DrimageDeliveryTrait;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Drupal\Core\Cache\Cache;
 
@@ -21,6 +21,8 @@ use Drupal\Core\Cache\Cache;
  * Subscribes to kernel request event so it handles non-existing images.
  */
 final class DrimageS3Subscriber implements EventSubscriberInterface {
+
+  use DrimageDeliveryTrait;
 
   /**
    * The stream wrapper manager service.
@@ -158,12 +160,8 @@ final class DrimageS3Subscriber implements EventSubscriberInterface {
         return;
       }
 
-      // Deliver the image.
-      try {
-        $event->setResponse($this->drimageManager->image($event->getRequest(), (int) $width, (int) $height, (int) $images->id(), $iwc_id, $format));
-      }
-      catch (NotFoundHttpException $exception) {
-        $event->setResponse(new Response($exception->getMessage(), 404));
+      // Deliver the image, waiting while another request generates it.
+      if (!$this->deliverDrimage($event, (int) $width, (int) $height, (int) $images->id(), $iwc_id, $format)) {
         return;
       }
 

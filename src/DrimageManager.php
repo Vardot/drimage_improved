@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Drupal\drimage_improved;
 
+use Drupal\Component\Utility\Crypt;
 use Drupal\Component\Utility\DeprecationHelper;
 use Drupal\image\ImageStyleInterface;
 use Drupal\Core\Entity\EntityStorageException;
@@ -13,11 +14,17 @@ use Drupal\image\Entity\ImageStyle;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
  * Resolves, creates and delivers the on-the-fly Drimage image styles.
  */
 final class DrimageManager extends ImageStyleDownloadController implements DrimageManagerInterface {
+
+  /**
+   * Seconds a request waits for another request generating the same image.
+   */
+  public const GENERATION_WAIT = 2;
 
   /**
    * Given a raw width and height: check if it adheres to the settings.
@@ -401,10 +408,72 @@ final class DrimageManager extends ImageStyleDownloadController implements Drima
         $token = DeprecationHelper::backwardsCompatibleCall(\Drupal::VERSION, '11.4.0', fn() => ImageStyleInterface::TOKEN, fn() => IMAGE_DERIVATIVE_TOKEN);
         $request->query->set($token, $image_style->getPathToken($image_uri));
       }
-      return $this->deliver($request, $scheme, $image_style, $scheme);
+      return $this->deliverOnce($request, $scheme, $image_style, $scheme . '://' . $file_path);
     }
 
     return new Response($error_msg, 500);
+  }
+
+  /**
+   * The name of the lock held while a Drimage derivative is generated.
+   *
+   * @param \Drupal\image\ImageStyleInterface $image_style
+   *   The image style.
+   * @param string $image_uri
+   *   The URI of the requested image.
+   *
+   * @return string
+   *   The lock name.
+   */
+  public static function generationLockName(ImageStyleInterface $image_style, string $image_uri): string {
+    return 'drimage_improved_deliver:' . $image_style->id() . ':' . Crypt::hashBase64($image_uri);
+  }
+
+  /**
+   * Delivers a derivative, generating it only once under concurrent requests.
+   *
+   * Uses the lock API the way core does: the first request takes the lock and
+   * generates the derivative; any other request for the same derivative waits
+   * for that lock with LockBackendInterface::wait(), takes it in turn and
+   * delivers what the first one generated. Core's own deliver() throws "Image generation in
+   * progress" at once when its lock is taken, and an image tag never retries.
+   *
+   * The lock is held until core has finished writing the file, so a waiting
+   * request never reads a derivative that is only half written.
+   *
+   * @param \Symfony\Component\HttpFoundation\Request $request
+   *   The request, carrying the file and token query parameters.
+   * @param string $scheme
+   *   The file scheme.
+   * @param \Drupal\image\ImageStyleInterface $image_style
+   *   The image style.
+   * @param string $image_uri
+   *   The URI of the requested (possibly converted) image.
+   *
+   * @return \Symfony\Component\HttpFoundation\Response
+   *   The derivative response.
+   *
+   * @throws \Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException
+   *   Thrown when the derivative is still being generated after the wait.
+   */
+  protected function deliverOnce(Request $request, string $scheme, ImageStyleInterface $image_style, string $image_uri): Response {
+    $lock_name = static::generationLockName($image_style, $image_uri);
+    $deadline = microtime(TRUE) + self::GENERATION_WAIT;
+    // Another request is generating it: wait until its lock may be free, then
+    // try to take it again. Whoever holds the lock either finds the finished
+    // derivative or generates it, so no two requests ever generate it at once.
+    while (!$this->lock->acquire($lock_name)) {
+      if (microtime(TRUE) >= $deadline) {
+        throw new ServiceUnavailableHttpException(3, 'Image generation in progress. Try again shortly.');
+      }
+      $this->lock->wait($lock_name, 1);
+    }
+    try {
+      return $this->deliver($request, $scheme, $image_style, $scheme);
+    }
+    finally {
+      $this->lock->release($lock_name);
+    }
   }
 
 }

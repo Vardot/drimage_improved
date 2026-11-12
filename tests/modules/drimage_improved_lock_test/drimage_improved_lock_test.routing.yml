@@ -1,0 +1,8 @@
+drimage_improved_lock_test.hold:
+  path: '/drimage-improved-lock-test/hold'
+  defaults:
+    _controller: '\Drupal\drimage_improved_lock_test\Controller\LockTestController::hold'
+  requirements:
+    _permission: 'administer image styles'
+  options:
+    no_cache: TRUE
